@@ -24,4 +24,11 @@
         "views/general/data_centers.xml",
         "views/general/worlds.xml",
     ],
+
+    "asserts": {
+        "web.assets_backend": [
+            "tataru_secret_market/static/src/img/icon.png"
+        ]
+
+    }
 }

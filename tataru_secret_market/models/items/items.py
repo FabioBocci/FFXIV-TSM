@@ -10,10 +10,10 @@ class Items(models.Model):
     unique_id = fields.Integer(index=True)
     name = fields.Char()
     sellable = fields.Boolean()
-    craftable = fields.Boolean(compute="_compute_craftable_item", index=True, store=True)
-    crafting_recipe_id = fields.One2many('tataru_secret_market.item_recipe', 'result_item_id')
+    craftable = fields.Boolean(index=True, store=True)
+    crafting_recipe_id = fields.Many2one('tataru_secret_market.item_recipe')
     ingredients_ids = fields.One2many('tataru_secret_market.item_ingredient', 'item_id')
-    recipe_for = fields.One2many(related="ingredients_ids.recipe_id.result_item_id", string="Recipe for")
+    # recipe_for = fields.One2many(related="ingredients_ids.recipe_id")
     transactions_ids = fields.One2many('tataru_secret_market.item_sale_transactions', 'item_selled')
     transactions_count_last_24h = fields.Integer(compute='_compute_transactions_count')
     transactions_count_last_7d = fields.Integer(compute='_compute_transactions_count')
@@ -28,11 +28,6 @@ class Items(models.Model):
         for record in self:
             record.transactions_count_last_24h = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=1))))
             record.transactions_count_last_7d = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=7))))
-
-    @api.depends('crafting_recipe_id')
-    def _compute_craftable_item(self):
-        for record in self:
-            record.craftable = bool(record.crafting_recipe_id)
 
     @api.model
     def sync_items(self):
@@ -65,6 +60,11 @@ class Items(models.Model):
                     'sellable': int(key) in markettable_list_key,
                 })
 
+    def sync_item_data(self):
+        self.with_delay().sync_item_transactions()
+        self.with_delay().sync_item_availability()
+        self.with_delay().sync_item_recipe()
+
     def sync_item_transactions(self):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
         transactions_model = self.env['tataru_secret_market.item_sale_transactions']
@@ -76,3 +76,8 @@ class Items(models.Model):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
         availability_model = self.env['tataru_secret_market.item_availability']
         availability_model.sync_item_availability(self, current_world.data_center_id)
+
+    def sync_item_recipe(self):
+        recipe_model = self.env['tataru_secret_market.item_recipe']
+        for record in self:
+            recipe_model.sync_recipes(record)

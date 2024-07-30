@@ -23,6 +23,7 @@
                 <group>
                     <header>
                         <button name="sync_items" string="Sync Items" type="object" class="btn btn-primary"/>
+                        <button name="sync_item_data" string="Sync Item Data" type="object" class="btn btn-primary"/>
                     </header>
                 </group>
                 <group>
@@ -74,15 +75,17 @@
                     </page>
                     <page string="Crafting">
                         <group>
-                            <field name="recipe_for" string= "">
+                            <field name="crafting_recipe_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="ingredients_ids" string= "">
                                 <tree>
-                                    <field name="name"/>
-                                    <field name="unique_id"/>
-                                    <field name="sellable"/>
+                                    <field name="recipe_id" />
+                                    <field name="quantity" />
                                 </tree>
                             </field>
                         </group>
-                        <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"/>
+                        <button name="sync_item_recipe" string="Sync Recipe" type="object" class="btn btn-primary"/>
                     </page>
                 </notebook>
             </form>
