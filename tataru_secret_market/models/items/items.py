@@ -22,6 +22,7 @@ class Items(models.Model):
 
     last_time_sync_transactions = fields.Datetime()
     last_time_sync_availability = fields.Datetime()
+    last_time_sync_recipe = fields.Datetime()
 
     @api.depends('transactions_ids', 'transactions_ids.sale_date')
     def _compute_transactions_count(self):
@@ -71,13 +72,16 @@ class Items(models.Model):
         for record in self:
             record.transactions_ids.unlink()  # TODO - non cancellare ma aggiornare i dati aggiungend
             transactions_model.sync_item_transactions(record, current_world)
+            record.last_time_sync_transactions = fields.Datetime.now()
 
     def sync_item_availability(self):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
         availability_model = self.env['tataru_secret_market.item_availability']
         availability_model.sync_item_availability(self, current_world.data_center_id)
+        self.last_time_sync_availability = fields.Datetime.now()
 
     def sync_item_recipe(self):
         recipe_model = self.env['tataru_secret_market.item_recipe']
         for record in self:
             recipe_model.sync_recipes(record)
+            record.last_time_sync_recipe = fields.Datetime.now()
