@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree view for Items -->
+    <record id="view_items_tree" model="ir.ui.view">
+        <field name="name">items.tree</field>
+        <field name="model">tataru_secret_market.items</field>
+        <field name="arch" type="xml">
+            <tree string="Items">
+                <field name="unique_id"/>
+                <field name="name"/>
+                <field name="sellable"/>
+                <field name="craftable"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form view for Items -->
+    <record id="view_items_form" model="ir.ui.view">
+        <field name="name">items.form</field>
+        <field name="model">tataru_secret_market.items</field>
+        <field name="arch" type="xml">
+            <form string="Items">
+                <group>
+                    <header>
+                        <button name="sync_items" string="Sync Items" type="object" class="btn btn-primary"/>
+                    </header>
+                </group>
+                <group>
+                    <field name="unique_id"/>
+                    <field name="name"/>
+                    <field name="sellable"/>
+                    <field name="craftable"/>
+                </group>
+
+                <notebook>
+                    <page string="Description">
+
+                    </page>
+                    <page string="Crafting">
+                    </page>
+                    <page string="Transactions">
+                        <group>
+                            <field name="transactions_count_last_24h" string="Transactions in the last 24h"/>
+                            <field name="transactions_count_last_7d" string="Transactions in the last 7d"/>
+                        </group>
+                        <group>
+                            <field name="transactions_ids" string= "">
+                                <tree>
+                                    <field name="sale_date"/>
+                                    <field name="buyer_name"/>
+                                    <field name="world_id"/>
+                                    <field name="quantity"/>
+                                    <field name="price"/>
+                                    <field name="total_price"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <button name="sync_item_transactions" string="Sync Transactions" type="object" class="btn btn-primary"/>
+                    </page>
+                    <page string="Market Availability">
+                        <group>
+                            <field name="availability_ids" string= "">
+                                <tree>
+                                    <field name="world_id"/>
+                                    <field name="price"/>
+                                    <field name="quantity"/>
+                                    <field name="total_price_with_tax"/>
+                                    <field name="high_quality"/>
+                                    <field name="reteiner_name"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"/>
+                    </page>
+                    <page string="Crafting">
+                        <group>
+                            <field name="recipe_for" string= "">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="unique_id"/>
+                                    <field name="sellable"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"/>
+                    </page>
+                </notebook>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view for Items -->
+    <record id="view_items_search" model="ir.ui.view">
+        <field name="name">items.search</field>
+        <field name="model">tataru_secret_market.items</field>
+        <field name="arch" type="xml">
+            <search string="Items">
+                <field name="name"/>
+                <field name="sellable"/>
+                <field name="craftable"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Items -->
+    <record id="action_items" model="ir.actions.act_window">
+        <field name="name">Items</field>
+        <field name="res_model">tataru_secret_market.items</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Item
+            </p>
+        </field>
+    </record>
+
+    <record
+        model="ir.actions.server"
+        id="action_sync_items"
+    >
+        <field name="name">Sync Items</field>
+        <field name="model_id" ref="tataru_secret_market.model_tataru_secret_market_items" />
+        <field name="binding_model_id" ref="tataru_secret_market.model_tataru_secret_market_items" />
+        <field name="binding_view_types">list,kanban</field>
+        <field name="state">code</field>
+        <field name="code">
+            model.sync_items("")
+        </field>
+    </record>
+
+    <!-- Menu item for Items -->
+    <menuitem id="menu_items" name="Items" action="action_items"/>
+</odoo>
