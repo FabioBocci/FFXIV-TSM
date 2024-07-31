@@ -1,0 +1,18 @@
+<odoo>
+	<record
+            id="ir_cron_scheduler_load_transactions"
+            model="ir.cron"
+        >
+            <field name="name">Sofidel Web Tracker: deactivate privacies</field>
+            <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+            <field name="state">code</field>
+            <field name="code">model.cron_sync_items_transactions()</field>
+            <field name="active" eval="False" />
+            <field name="user_id">1</field> <!-- ref="base.user_root" -->
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+        </record>
+
+
+</odoo>

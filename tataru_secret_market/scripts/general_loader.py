@@ -54,6 +54,7 @@ class GeneralLoader(models.AbstractModel):
         # divido in batch da 8
         batch = self.env["queue.job.batch"].get_new_batch("Sync item transactions")
         for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
+            # TODO - ETA = 1 minuto per item batch
             self.with_context(
                 job_batch_id=batch
             ).with_delay().sync_items_transactions_job(item_batch)
