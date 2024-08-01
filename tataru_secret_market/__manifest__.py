@@ -23,6 +23,7 @@
         "views/items/items.xml",
         "views/general/data_centers.xml",
         "views/general/worlds.xml",
+        "scripts/scheduler.xml",
     ],
 
     "asserts": {

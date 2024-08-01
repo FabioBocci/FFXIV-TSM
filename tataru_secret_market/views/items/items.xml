@@ -6,11 +6,57 @@
         <field name="model">tataru_secret_market.items</field>
         <field name="arch" type="xml">
             <tree string="Items">
+                <field name="item_icon" string="Icon URL" widget="image_url" class="o_field_image oe_avatar"/>
                 <field name="unique_id"/>
                 <field name="name"/>
                 <field name="sellable"/>
                 <field name="craftable"/>
             </tree>
+        </field>
+    </record>
+
+     <!-- Kanban view for Items -->
+    <record id="view_items_kanban" model="ir.ui.view">
+        <field name="name">items.kanban</field>
+        <field name="model">tataru_secret_market.items</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" sample="1">
+                <field name="item_icon_hd" string="Icon URL" widget="image_url" class="o_field_image oe_avatar"/>
+                <field name="unique_id"/>
+                <field name="name"/>
+                <field name="sellable"/>
+                <field name="craftable"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong>
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                            </div>
+                            <hr class="mt8 mb8"/>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div>
+                                        <strong>
+                                        ID:  <field name="unique_id"/>
+                                        </strong>
+                                    </div>
+                                    <div>
+                                      Sellable:  <field name="sellable" string="Sellable"/> <br/>
+                                      Craftable:  <field name="craftable" string="Craftable"/> <br/>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <field name="item_icon_hd" string="Icon URL" widget="image_url" class="o_kanban_image me-1 o_image_64_container"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
@@ -20,17 +66,21 @@
         <field name="model">tataru_secret_market.items</field>
         <field name="arch" type="xml">
             <form string="Items">
+                <header>
+                    <button name="sync_items" string="Sync Items" type="object" class="btn btn-primary"/>
+                    <button name="sync_item_full_data" string="Sync Item FULL Data" type="object" class="btn btn-primary"/>
+                    <button name="action_sync_item_data" string="Sync Item Data" type="object" class="btn btn-primary"/>
+                </header>
                 <group>
-                    <header>
-                        <button name="sync_items" string="Sync Items" type="object" class="btn btn-primary"/>
-                        <button name="sync_item_data" string="Sync Item Data" type="object" class="btn btn-primary"/>
-                    </header>
-                </group>
-                <group>
-                    <field name="unique_id"/>
-                    <field name="name"/>
-                    <field name="sellable"/>
-                    <field name="craftable"/>
+                    <group>
+                        <field name="unique_id" readonly="1"/>
+                        <field name="name"/>
+                        <field name="sellable"/>
+                        <field name="craftable"/>
+                    </group>
+                    <group>
+                        <field name="item_icon_hd" widget="image_url" class="o_field_image oe_avatar"/>
+                    </group>
                 </group>
 
                 <notebook>
@@ -74,11 +124,11 @@
                         <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"/>
                     </page>
                     <page string="Crafting">
-                        <group>
-                            <field name="crafting_recipe_id" readonly="1"/>
+                        <group string="Crafted by">
+                            <field name="crafting_recipe_ids" readonly="1" options='{"show_string": False}'/>
                         </group>
-                        <group>
-                            <field name="ingredients_ids" string= "">
+                        <group string="Used For:">
+                            <field name="ingredients_ids" string= "" options='{"show_string": False}'>
                                 <tree>
                                     <field name="recipe_id" />
                                     <field name="quantity" />
@@ -101,6 +151,9 @@
                 <field name="name"/>
                 <field name="sellable"/>
                 <field name="craftable"/>
+                <filter name="sellable" string="Sellable" domain="[('sellable','=',True)]"/>
+                <filter name="craftable" string="Craftable" domain="[('craftable','=',True)]"/>
+                <filter name="Craftable And Sellable" string="Craftable And Sellable" domain="[('craftable','=',True),('sellable','=',True)]"/>
             </search>
         </field>
     </record>
@@ -109,7 +162,7 @@
     <record id="action_items" model="ir.actions.act_window">
         <field name="name">Items</field>
         <field name="res_model">tataru_secret_market.items</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">kanban,tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first Item

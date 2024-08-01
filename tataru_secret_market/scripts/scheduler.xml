@@ -1,18 +1,78 @@
 <odoo>
-	<record
-            id="ir_cron_scheduler_load_transactions"
-            model="ir.cron"
-        >
-            <field name="name">Sofidel Web Tracker: deactivate privacies</field>
-            <field name="model_id" ref="model_tataru_secret_market_general_loader" />
-            <field name="state">code</field>
-            <field name="code">model.cron_sync_items_transactions()</field>
-            <field name="active" eval="False" />
-            <field name="user_id">1</field> <!-- ref="base.user_root" -->
-            <field name="interval_number">1</field>
-            <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
-        </record>
+	<record id="ir_cron_scheduler_load_transactions" model="ir.cron" >
+        <field name="name"> TSM : Run sync item transactions </field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_items_transactions()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
 
+    <record id="ir_cron_scheduler_load_availability" model="ir.cron" >
+        <field name="name"> TSM : Run sync item availability </field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_items_availability()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
 
+    <record id="ir_cron_scheduler_load_dc_worlds" model="ir.cron" >
+        <field name="name"> TSM : Run sync data center and worlds</field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_datacenters_and_worlds()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="ir_cron_scheduler_job" model="ir.cron" >
+        <field name="name"> TSM : Run sync jobs </field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_jobs()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="ir_cron_scheduler_load_items" model="ir.cron" >
+        <field name="name"> TSM : Run sync item </field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_items()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="ir_cron_scheduler_load_items_data" model="ir.cron" >
+        <field name="name"> TSM : Run sync item data </field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_item_data()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="ir_cron_scheduler_load_items_recipe" model="ir.cron" >
+        <field name="name"> TSM : Run sync item recipe </field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_sync_item_recipe()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
 </odoo>

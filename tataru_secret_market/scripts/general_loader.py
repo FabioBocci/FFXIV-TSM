@@ -9,7 +9,6 @@ class GeneralLoader(models.AbstractModel):
     def load_all_data(self):
         self.env["tataru_secret_market.worlds"].with_delay().sync_worlds(None)
         self.env["tataru_secret_market.data_centers"].with_delay().sync_datacenter(None)
-        self.env["tataru_secret_market.data_centers"].with_delay().sync_datacenter(None)
         self.env["tataru_secret_market.jobs"].with_delay().sync_jobs(None)
         self.env["tataru_secret_market.items"].with_delay().sync_items(None)
 
@@ -41,6 +40,7 @@ class GeneralLoader(models.AbstractModel):
         # prendo tutti gli item che non hanno transazioni sincronizzate da più di 1 giorno
         items = self.env["tataru_secret_market.items"].search(
             [
+                "&",
                 "|",
                 (
                     "last_time_sync_transactions",
@@ -48,16 +48,19 @@ class GeneralLoader(models.AbstractModel):
                     fields.Datetime.now() - datetime.timedelta(days=1),
                 ),
                 ("last_time_sync_transactions", "=", False),
+                ("sellable", "=", True),
             ]
         )
+        # TODO - dovremmo cercare di limitarlo un po' di più con ulteririori filtri
 
         # divido in batch da 8
         batch = self.env["queue.job.batch"].get_new_batch("Sync item transactions")
+        time = fields.Datetime.now()
         for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
-            # TODO - ETA = 1 minuto per item batch
             self.with_context(
                 job_batch_id=batch
-            ).with_delay().sync_items_transactions_job(item_batch)
+            ).with_delay(eta=time).sync_items_transactions_job(item_batch)
+            time += datetime.timedelta(seconds=5)
 
     @api.model
     def sync_items_transactions_job(self, items):
@@ -67,3 +70,110 @@ class GeneralLoader(models.AbstractModel):
             record.transactions_ids.unlink()
             transactions_model.sync_item_transactions(record, current_world)
             record.last_time_sync_transactions = fields.Datetime.now()
+
+        return "Transactions synced for: {}".format("\n".join(item.name for item in items))
+
+    @api.model
+    def cron_sync_items_availability(self):
+        # prendo tutti gli item che non hanno transazioni sincronizzate da più di 1 giorno
+        items = self.env["tataru_secret_market.items"].search(
+            [
+                "&",
+                "|",
+                (
+                    "last_time_sync_availability",
+                    "<",
+                    fields.Datetime.now() - datetime.timedelta(days=1),
+                ),
+                ("last_time_sync_availability", "=", False),
+                ("sellable", "=", True),
+            ]
+        )
+        # TODO - dovremmo cercare di limitarlo un po' di più con ulteririori filtri
+
+        # divido in batch da 8
+        batch = self.env["queue.job.batch"].get_new_batch("Sync item availability")
+        time = fields.Datetime.now()
+        for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
+            self.with_context(
+                job_batch_id=batch
+            ).with_delay(eta=time).sync_items_availability_job(item_batch)
+            time += datetime.timedelta(seconds=5)
+
+    @api.model
+    def sync_items_availability_job(self, items):
+        items.sync_item_availability()
+
+        return "Availability synced for: {}".format("\n".join(item.name for item in items))
+
+    # Runned 1 every week
+    @api.model
+    def cron_sync_jobs(self):
+        self.env["tataru_secret_market.jobs"].with_delay().sync_jobs(None)
+
+    # Runned 1 every week
+    @api.model
+    def cron_sync_items(self):
+        self.env["tataru_secret_market.items"].with_delay().sync_items(None)
+
+    # Runned 1 every week
+    @api.model
+    def cron_sync_datacenters_and_worlds(self):
+        self.sync_datacenters(True)
+        self.sync_worlds(True)
+
+    @api.model
+    def cron_sync_item_data(self):
+        # prendo tutti gli item
+        items = self.env["tataru_secret_market.items"].search(
+            [
+                "|",
+                (
+                    "last_time_sync_data",
+                    "<",
+                    fields.Datetime.now() - datetime.timedelta(days=0),
+                ),
+                ("last_time_sync_data", "=", False),
+            ])
+        # divido in batch da 8
+        batch = self.env["queue.job.batch"].get_new_batch("Sync item data")
+        time = fields.Datetime.now()
+        for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
+            self.with_context(
+                job_batch_id=batch
+            ).with_delay(eta=time).sync_item_data_job(item_batch)
+            time += datetime.timedelta(seconds=1)  # TODO - rendere tipo 10 minuti in produzione per non sovraccaricare il server
+
+    @api.model
+    def sync_item_data_job(self, items):
+        for item in items:
+            self.env["tataru_secret_market.items"].sync_item_data(item)
+
+        return "Data synced for: \n {}".format("\n".join(" - " + item.name for item in items))
+
+    @api.model
+    def cron_sync_item_recipe(self):
+        # prendo tutti gli item craftabili
+        items = self.env["tataru_secret_market.items"].search(
+            [
+                "|",
+                (
+                    "last_time_sync_recipe",
+                    "<",
+                    fields.Datetime.now() - datetime.timedelta(days=7),
+                ),
+                ("last_time_sync_recipe", "=", False),
+            ])
+        # divido in batch da 8
+        batch = self.env["queue.job.batch"].get_new_batch("Sync item recipe")
+        time = fields.Datetime.now()
+        for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
+            self.with_context(
+                job_batch_id=batch
+            ).with_delay(eta=time).sync_item_recipe_job(item_batch)
+            time += datetime.timedelta(seconds=1)
+
+    @api.model
+    def sync_item_recipe_job(self, items):
+        items.sync_item_recipe()
+        return "Recipe synced for: {}".format("\n".join(item.name for item in items))

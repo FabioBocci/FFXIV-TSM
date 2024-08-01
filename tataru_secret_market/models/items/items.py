@@ -11,7 +11,9 @@ class Items(models.Model):
     name = fields.Char()
     sellable = fields.Boolean()
     craftable = fields.Boolean(index=True, store=True)
-    crafting_recipe_id = fields.Many2one('tataru_secret_market.item_recipe')
+    item_icon = fields.Char()
+    item_icon_hd = fields.Char()
+    crafting_recipe_ids = fields.One2many('tataru_secret_market.item_recipe', 'result_item_id')
     ingredients_ids = fields.One2many('tataru_secret_market.item_ingredient', 'item_id')
     # recipe_for = fields.One2many(related="ingredients_ids.recipe_id")
     transactions_ids = fields.One2many('tataru_secret_market.item_sale_transactions', 'item_selled')
@@ -23,6 +25,7 @@ class Items(models.Model):
     last_time_sync_transactions = fields.Datetime()
     last_time_sync_availability = fields.Datetime()
     last_time_sync_recipe = fields.Datetime()
+    last_time_sync_data = fields.Datetime()
 
     @api.depends('transactions_ids', 'transactions_ids.sale_date')
     def _compute_transactions_count(self):
@@ -61,10 +64,51 @@ class Items(models.Model):
                     'sellable': int(key) in markettable_list_key,
                 })
 
-    def sync_item_data(self):
+    def action_sync_item_data(self):
+        for entry in self:
+            entry.sync_item_data(entry)
+
+    @api.model
+    def sync_item_data(self, item_id):
+        item_id.ensure_one()
+        try:
+            res = requests.get(f"https://xivapi.com/item/{item_id.unique_id}?columns=ID,Icon,IconHD,Recipes")
+            res.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise Exception(err)
+
+        data = res.json()
+
+        update_dict = {
+            "item_icon": "https://xivapi.com" + data['Icon'],
+            "item_icon_hd": "https://xivapi.com" + data['IconHD']
+        }
+
+        recipes = data['Recipes']
+        if recipes is None:
+            update_dict['craftable'] = False
+            update_dict['crafting_recipe_ids'] = False
+        else:
+            for recipe in recipes:
+                job_id = self.env['tataru_secret_market.jobs'].search([('unique_id', '=', int(recipe['ClassJobID']))])
+                recipe_id = self.env['tataru_secret_market.item_recipe'].search([('unique_id', '=', int(recipe['ID']))])
+
+                if not recipe_id:
+                    recipe_id = self.env['tataru_secret_market.item_recipe'].create({
+                        'unique_id': int(recipe['ID']),
+                        'result_item_id': item_id.id,
+                        "job_id": job_id.id,
+                        "level_required": recipe['Level'],
+                    })
+            update_dict['craftable'] = True
+        item_id.write(update_dict)
+        item_id.last_time_sync_data = fields.Datetime.now()
+
+    def sync_item_full_data(self):
         self.with_delay().sync_item_transactions()
         self.with_delay().sync_item_availability()
         self.with_delay().sync_item_recipe()
+        self.with_delay().sync_item_data(self)
 
     def sync_item_transactions(self):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
