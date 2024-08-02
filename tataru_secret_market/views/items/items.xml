@@ -185,5 +185,5 @@
     </record>
 
     <!-- Menu item for Items -->
-    <menuitem id="menu_items" name="Items" action="action_items"/>
+    <menuitem id="menu_items" name="Items" action="action_items" web_icon="tataru_secret_market,static/description/item_icon.png"/>
 </odoo>

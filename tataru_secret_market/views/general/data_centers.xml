@@ -65,5 +65,5 @@
     </record>
 
     <!-- Menu item for Data Centers -->
-    <menuitem id="menu_datacenters" name="Data Centers" action="action_datacenters"/>
+    <menuitem id="menu_datacenters" name="Data Centers" action="action_datacenters" web_icon="tataru_secret_market,static/description/general_icon.jpg"/>
 </odoo>
