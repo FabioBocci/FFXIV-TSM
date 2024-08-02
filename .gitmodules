@@ -1,0 +1,3 @@
+[submodule "discord-addons"]
+	path = discord-addons
+	url = https://github.com/FabioBocci/discord-addons.git

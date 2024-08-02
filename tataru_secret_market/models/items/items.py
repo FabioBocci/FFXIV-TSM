@@ -27,6 +27,8 @@ class Items(models.Model):
     last_time_sync_recipe = fields.Datetime()
     last_time_sync_data = fields.Datetime()
 
+    universalis_last_sync_time_availability = fields.Datetime()
+
     @api.depends('transactions_ids', 'transactions_ids.sale_date')
     def _compute_transactions_count(self):
         for record in self:

@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import requests
+from datetime import datetime
 
 
 class ItemAvailability(models.Model):
@@ -35,7 +36,7 @@ class ItemAvailability(models.Model):
     @api.model
     def sync_item_availability(self, items, data_center):
         is_more_then_one = len(items) > 1
-        items_str = ",".join([str(item.unique_id) for item in items]) if is_more_then_one > 1 else str(items[0].unique_id)
+        items_str = ",".join([str(item.unique_id) for item in items]) if is_more_then_one else str(items[0].unique_id)
         api_url = f"https://universalis.app/api/{data_center.name}/{items_str}?listings=50&entries=0"
 
         try:
@@ -67,9 +68,14 @@ class ItemAvailability(models.Model):
                 }])
 
         else:
-            for item in items:
+            items_list_json = data["items"]
+            for item_json in items_list_json:
+                item = items.filtered(lambda x: x.unique_id == int(item_json["itemID"])).ensure_one()
                 item.availability_ids.unlink()
-                for entry in data[str(item.unique_id)]["listings"]:
+                # time = item_json["lastUploadTime"]
+
+                item.universalis_last_sync_time_availability = fields.Datetime.now()
+                for entry in item_json["listings"]:
                     world_id = self.env['tataru_secret_market.worlds'].search([('unique_id', '=', int(entry['worldID']))])
                     self.env['tataru_secret_market.item_availability'].create([{
                         'item_id': item.id,
