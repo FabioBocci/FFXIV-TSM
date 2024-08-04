@@ -2,3 +2,4 @@
 
 from . import items
 from . import general
+from . import opportunity

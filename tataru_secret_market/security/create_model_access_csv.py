@@ -25,6 +25,8 @@ MODELS = (
                                             'manager': (1, 1, 1, 1), 'reader': (1, 0, 0, 0)}),
     ('tataru_secret_market', 'tataru_secret_market.item_ingredient', {'admin': (1, 1, 1, 1),
                                             'manager': (1, 1, 1, 1), 'reader': (1, 0, 0, 0)}),
+    ('tataru_secret_market', 'tataru_secret_market.item_opportunity', {'admin': (1, 1, 1, 1),
+                                            'manager': (1, 1, 1, 1), 'reader': (1, 0, 0, 0)}),
     )
 # fmt: on
 

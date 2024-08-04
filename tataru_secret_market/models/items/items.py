@@ -17,8 +17,9 @@ class Items(models.Model):
     ingredients_ids = fields.One2many('tataru_secret_market.item_ingredient', 'item_id')
     # recipe_for = fields.One2many(related="ingredients_ids.recipe_id")
     transactions_ids = fields.One2many('tataru_secret_market.item_sale_transactions', 'item_selled')
-    transactions_count_last_24h = fields.Integer(compute='_compute_transactions_count')
-    transactions_count_last_7d = fields.Integer(compute='_compute_transactions_count')
+    transactions_count_last_24h = fields.Integer(compute='_compute_transactions_count', store=True)
+    transactions_count_last_7d = fields.Integer(compute='_compute_transactions_count', store=True)
+    mostly_hq = fields.Boolean(compute='_compute_transactions_count', store=True)
 
     availability_ids = fields.One2many('tataru_secret_market.item_availability', 'item_id')
 
@@ -31,9 +32,16 @@ class Items(models.Model):
 
     @api.depends('transactions_ids', 'transactions_ids.sale_date')
     def _compute_transactions_count(self):
+        require_hq_percentage = self.env["ir.config_parameter"].sudo().get_param("require_hq_percentage", 0.5)
         for record in self:
+            if not record.sellable:
+                record.transactions_count_last_24h = 0
+                record.transactions_count_last_7d = 0
+                record.mostly_hq = False
+
             record.transactions_count_last_24h = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=1))))
             record.transactions_count_last_7d = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=7))))
+            record.mostly_hq = len(record.transactions_ids.filtered(lambda x: x.high_quality)) / len(record.transactions_ids) > require_hq_percentage if len(record.transactions_ids) > 0 else False
 
     @api.model
     def sync_items(self):

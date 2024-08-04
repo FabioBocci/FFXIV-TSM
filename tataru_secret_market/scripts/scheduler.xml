@@ -75,4 +75,37 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
     </record>
+
+    <record id="ir_cron_scheduler_load_items_opportunities" model="ir.cron" >
+        <field name="name"> TSM : Load Opportunities</field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_load_opportunities()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">30</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="ir_cron_scheduler_delete_items_opportunities" model="ir.cron" >
+        <field name="name"> TSM : Delete Opportunities</field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_delete_old_oppotunities()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">15</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+    <record id="ir_cron_scheduler_update_items_opportunities" model="ir.cron" >
+        <field name="name"> TSM : Update Opportunities</field>
+        <field name="model_id" ref="model_tataru_secret_market_general_loader" />
+        <field name="state">code</field>
+        <field name="code">model.cron_opportunities_update()</field>
+        <field name="active" eval="False" />
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+    </record>
 </odoo>

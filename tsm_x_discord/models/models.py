@@ -3,9 +3,9 @@
 # from odoo import models, fields, api
 
 
-# class tataru_secret_market(models.Model):
-#     _name = 'tataru_secret_market.tataru_secret_market'
-#     _description = 'tataru_secret_market.tataru_secret_market'
+# class tsm_x_discord(models.Model):
+#     _name = 'tsm_x_discord.tsm_x_discord'
+#     _description = 'tsm_x_discord.tsm_x_discord'
 
 #     name = fields.Char()
 #     value = fields.Integer()

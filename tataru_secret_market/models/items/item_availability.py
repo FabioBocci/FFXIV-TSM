@@ -21,7 +21,7 @@ class ItemAvailability(models.Model):
     quantity = fields.Integer()
     tax = fields.Integer()
     total_price = fields.Integer(compute='_compute_total_price')
-    total_price_with_tax = fields.Integer(compute='_compute_total_price')
+    total_price_with_tax = fields.Integer(compute='_compute_total_price', store=True)
 
     # retainer infos
     reteiner_name = fields.Char()
@@ -37,7 +37,7 @@ class ItemAvailability(models.Model):
     def sync_item_availability(self, items, data_center):
         is_more_then_one = len(items) > 1
         items_str = ",".join([str(item.unique_id) for item in items]) if is_more_then_one else str(items[0].unique_id)
-        api_url = f"https://universalis.app/api/{data_center.name}/{items_str}?listings=50&entries=0"
+        api_url = f"https://universalis.app/api/{data_center.name}/{items_str}?listings=100&entries=0"
 
         try:
             res = requests.get(api_url)
