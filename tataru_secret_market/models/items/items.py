@@ -123,10 +123,7 @@ class Items(models.Model):
     def sync_item_transactions(self):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
         transactions_model = self.env['tataru_secret_market.item_sale_transactions']
-        for record in self:
-            record.transactions_ids.unlink()  # TODO - non cancellare ma aggiornare i dati aggiungend
-            transactions_model.sync_item_transactions(record, current_world)
-            record.last_time_sync_transactions = fields.Datetime.now()
+        transactions_model.sync_item_transactions(self, current_world)
 
     def sync_item_availability(self):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()

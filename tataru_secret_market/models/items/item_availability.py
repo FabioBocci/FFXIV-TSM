@@ -1,6 +1,8 @@
 from odoo import models, fields, api
 import requests
-from datetime import datetime
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class ItemAvailability(models.Model):
@@ -20,7 +22,7 @@ class ItemAvailability(models.Model):
     price = fields.Integer()
     quantity = fields.Integer()
     tax = fields.Integer()
-    total_price = fields.Integer(compute='_compute_total_price')
+    total_price = fields.Integer(compute='_compute_total_price', store=True)
     total_price_with_tax = fields.Integer(compute='_compute_total_price', store=True)
 
     # retainer infos
@@ -37,7 +39,8 @@ class ItemAvailability(models.Model):
     def sync_item_availability(self, items, data_center):
         is_more_then_one = len(items) > 1
         items_str = ",".join([str(item.unique_id) for item in items]) if is_more_then_one else str(items[0].unique_id)
-        api_url = f"https://universalis.app/api/{data_center.name}/{items_str}?listings=100&entries=0"
+        # TODO - max 100 items per request
+        api_url = f"https://universalis.app/api/v2/{data_center.name}/{items_str}?listings=100&entries=0"
 
         try:
             res = requests.get(api_url)
@@ -47,15 +50,40 @@ class ItemAvailability(models.Model):
 
         data = res.json()
 
-        # TODO - CODE REFATORING!
-        if not is_more_then_one:
-            item = items[0]
-            item.availability_ids.unlink()  # per il momento elimino tutto e ricreo poi andrebbe cercato di aggiornare e basta
-            if "listings" not in data or not data["listings"]:
-                return
-            for entry in data["listings"]:
-                world_id = self.env['tataru_secret_market.worlds'].search([('unique_id', '=', int(entry['worldID']))])
-                self.env['tataru_secret_market.item_availability'].create([{
+        for item in items:
+            item_json = data if not is_more_then_one else data['items'][str(item.unique_id)]
+            if "listings" not in item_json or not item_json["listings"]:
+                continue
+            self.__sync_item_availability(item, item_json["listings"])
+
+    @api.model
+    def __sync_item_availability(self, item, listings):
+        availability_ids = [index for index in item.availability_ids.ids]
+        val_list = []
+        for entry in listings:
+            world_id = self.env['tataru_secret_market.worlds'].search([('unique_id', '=', int(entry['worldID']))])
+
+            listing_id = self.env['tataru_secret_market.item_availability'].search([
+                ("reteiner_id", "=", entry['retainerID']),
+                ("reteiner_name", "=", entry['retainerName']),
+                ("quantity", "=", entry['quantity']),
+                ('item_id', '=', item.id),
+                ('world_id', '=', world_id.id)], limit=1)
+            if listing_id:
+                listing_id.write({
+                    'item_id': item.id,
+                    'world_id': world_id.id,
+                    'high_quality': bool(entry['hq']),
+                    'price': entry['pricePerUnit'],
+                    'quantity': entry['quantity'],
+                    'tax': entry['tax'],
+                    'reteiner_name': entry['retainerName'],
+                    'reteiner_id': entry['retainerID'],
+                })
+                if listing_id.id in availability_ids:
+                    availability_ids.remove(listing_id.id)
+            else:
+                val_list.append({
                     'item_id': item.id,
                     'world_id': world_id.id,
                     'high_quality': bool(entry['hq']),
@@ -65,26 +93,8 @@ class ItemAvailability(models.Model):
                     'reteiner_name': entry['retainerName'],
                     'reteiner_id': entry['retainerID'],
                     'listing_id': entry['listingID']
-                }])
-
-        else:
-            items_list_json = data["items"]
-            for item_json in items_list_json:
-                item = items.filtered(lambda x: x.unique_id == int(item_json["itemID"])).ensure_one()
-                item.availability_ids.unlink()
-                # time = item_json["lastUploadTime"]
-
-                item.universalis_last_sync_time_availability = fields.Datetime.now()
-                for entry in item_json["listings"]:
-                    world_id = self.env['tataru_secret_market.worlds'].search([('unique_id', '=', int(entry['worldID']))])
-                    self.env['tataru_secret_market.item_availability'].create([{
-                        'item_id': item.id,
-                        'world_id': world_id.id,
-                        'high_quality': bool(entry['hq']),
-                        'price': entry['pricePerUnit'],
-                        'quantity': entry['quantity'],
-                        'tax': entry['tax'],
-                        'reteiner_name': entry['retainerName'],
-                        'reteiner_id': entry['retainerID'],
-                        'listing_id': entry['listingID']
-                    }])
+                })
+        if availability_ids:
+            _logger.info(f"Deleting {len(availability_ids)} availability")
+            self.env['tataru_secret_market.item_availability'].browse(availability_ids).unlink()
+        self.env['tataru_secret_market.item_availability'].create(val_list)

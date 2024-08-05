@@ -67,7 +67,6 @@ class GeneralLoader(models.AbstractModel):
         current_world = self.env["tataru_secret_market.worlds"].get_current_world()
         transactions_model = self.env["tataru_secret_market.item_sale_transactions"]
         for record in items:
-            record.transactions_ids.unlink()
             transactions_model.sync_item_transactions(record, current_world)
             record.last_time_sync_transactions = fields.Datetime.now()
 
@@ -220,11 +219,11 @@ class GeneralLoader(models.AbstractModel):
         items = self.env["tataru_secret_market.item_opportunity"].search([]).mapped("item_id")
         batch = self.env["queue.job.batch"].get_new_batch("Update opportunities")
         time = fields.Datetime.now()
-        for opportunity_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
+        for opportunity_batch in [items[i : i + 20] for i in range(0, len(items), 20)]:
             self.with_context(
                 job_batch_id=batch
             ).with_delay(eta=time).sync_items_availability_job(opportunity_batch)
             self.with_context(
                 job_batch_id=batch
             ).with_delay(eta=time).sync_items_transactions_job(opportunity_batch)
-            time += datetime.timedelta(seconds=3)
+            time += datetime.timedelta(seconds=10)
