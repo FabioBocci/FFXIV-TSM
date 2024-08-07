@@ -37,15 +37,16 @@ class ItemSaleTransactions(models.Model):
             raise Exception(err)
 
         data = res.json()
-        if not is_more_then_one:
-            item = items[0]
-            self.__sync_item_transactions(item, world, data["entries"])
+        data = data if not is_more_then_one else data["items"]
+        for item in items:
+            item_json = data if not is_more_then_one else data.get(str(item.unique_id))
+            if item_json is None:
+                _logger.warning(f"Not found item with id: {str(item.unique_id)} | item name: {item.name} | sellable: {item.sellable}")
+                continue
+            if "listings" not in item_json or not item_json["listings"]:
+                continue
+            self.__sync_item_transactions(item, world, item_json["entries"])
 
-        else:
-            items_data = data['items']
-            for item in items:
-                item_data = items_data[str(item.unique_id)]
-                self.__sync_item_transactions(item, world, item_data["entries"])
 
     @api.model
     def __sync_item_transactions(self, item, world, entries):

@@ -52,8 +52,12 @@ class ItemAvailability(models.Model):
         after_request = time.time()
         data = res.json()
         _logger.info(f"Request to Universalis for {api_url} took : {after_request - before_request} seconds")
+        data = data if not is_more_then_one else data.get("items")
         for item in items:
-            item_json = data if not is_more_then_one else data['items'][str(item.unique_id)]
+            item_json = data if not is_more_then_one else data.get(str(item.unique_id))
+            if item_json is None:
+                _logger.warning(f"Not found item with id: {str(item.unique_id)} | item name: {item.name} | sellable: {item.sellable}")
+
             if "listings" not in item_json or not item_json["listings"]:
                 continue
             self.__sync_item_availability(item, item_json["listings"])
