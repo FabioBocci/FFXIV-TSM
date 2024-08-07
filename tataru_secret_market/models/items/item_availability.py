@@ -61,6 +61,7 @@ class ItemAvailability(models.Model):
             if "listings" not in item_json or not item_json["listings"]:
                 continue
             self.__sync_item_availability(item, item_json["listings"])
+            item.last_time_sync_availability = fields.Datetime.now()
         after_sync = time.time()
         _logger.info(f"Sync for {items_str} took : {after_sync - after_request} seconds")
 

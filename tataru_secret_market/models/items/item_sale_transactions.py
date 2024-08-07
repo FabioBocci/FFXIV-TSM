@@ -46,6 +46,7 @@ class ItemSaleTransactions(models.Model):
             if "listings" not in item_json or not item_json["listings"]:
                 continue
             self.__sync_item_transactions(item, world, item_json["entries"])
+            item.last_time_sync_transactions = fields.Datetime.now()
 
 
     @api.model
