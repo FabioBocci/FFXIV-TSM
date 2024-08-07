@@ -53,7 +53,6 @@ class GeneralLoader(models.AbstractModel):
         )
         # TODO - dovremmo cercare di limitarlo un po' di più con ulteririori filtri
 
-        # divido in batch da 8
         batch = self.env["queue.job.batch"].get_new_batch("Sync item transactions")
         time = fields.Datetime.now()
         for item_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
@@ -66,9 +65,8 @@ class GeneralLoader(models.AbstractModel):
     def sync_items_transactions_job(self, items):
         current_world = self.env["tataru_secret_market.worlds"].get_current_world()
         transactions_model = self.env["tataru_secret_market.item_sale_transactions"]
-        for record in items:
-            transactions_model.sync_item_transactions(record, current_world)
-            record.last_time_sync_transactions = fields.Datetime.now()
+        transactions_model.sync_item_transactions(items, current_world)
+        items.last_time_sync_transactions = fields.Datetime.now()
 
         return "Transactions synced for: {}".format("\n".join(item.name for item in items))
 
@@ -90,7 +88,6 @@ class GeneralLoader(models.AbstractModel):
         )
         # TODO - dovremmo cercare di limitarlo un po' di più con ulteririori filtri
 
-        # divido in batch da 8
         batch = self.env["queue.job.batch"].get_new_batch("Sync item availability")
         time = fields.Datetime.now()
         for item_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
@@ -101,7 +98,10 @@ class GeneralLoader(models.AbstractModel):
 
     @api.model
     def sync_items_availability_job(self, items):
-        items.sync_item_availability()
+        current_world = self.env['tataru_secret_market.worlds'].get_current_world()
+        availability_model = self.env['tataru_secret_market.item_availability']
+        availability_model.sync_item_availability(items, current_world.data_center_id)
+        items.last_time_sync_availability = fields.Datetime.now()
 
         return "Availability synced for: {}".format("\n".join(item.name for item in items))
 
@@ -219,11 +219,11 @@ class GeneralLoader(models.AbstractModel):
         items = self.env["tataru_secret_market.item_opportunity"].search([]).mapped("item_id")
         batch = self.env["queue.job.batch"].get_new_batch("Update opportunities")
         time = fields.Datetime.now()
-        for opportunity_batch in [items[i : i + 20] for i in range(0, len(items), 20)]:
+        for opportunity_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
             self.with_context(
                 job_batch_id=batch
             ).with_delay(eta=time).sync_items_availability_job(opportunity_batch)
             self.with_context(
                 job_batch_id=batch
             ).with_delay(eta=time).sync_items_transactions_job(opportunity_batch)
-            time += datetime.timedelta(seconds=10)
+            time += datetime.timedelta(seconds=5)
