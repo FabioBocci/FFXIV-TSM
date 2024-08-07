@@ -56,14 +56,11 @@ class ItemSaleTransactions(models.Model):
             # se non esiste lo creo
             # (non mi serve aggiornarlo perchè è un dato che non cambia)
             # elimino tutti quelli che non ci sono più
-            found = self.env['tataru_secret_market.item_sale_transactions'].search([
-                ('item_selled', '=', item.id),
-                ('world_id', '=', world.id),
-                ('sale_date_timestamp', '=', int(entry['timestamp'])),
-                ("buyer_name", "=", entry['buyerName'])
-            ])
+            found = item.transactions_ids.filtered(
+                lambda x: x.sale_date_timestamp == int(entry['timestamp']) and x.buyer_name == entry['buyerName'])
 
             if found:
+                found = found[0]
                 transactions.remove(found.id)
                 continue
             val_list.append({

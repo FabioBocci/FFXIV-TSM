@@ -6,10 +6,10 @@ class Worlds(models.Model):
     _name = 'tataru_secret_market.worlds'
     _order = "unique_id"
 
-    unique_id = fields.Integer(required=True)
-    name = fields.Char(required=True)
+    unique_id = fields.Integer(required=True, index=True)
+    name = fields.Char(required=True, index=True)
 
-    data_center_id = fields.Many2one('tataru_secret_market.data_centers')
+    data_center_id = fields.Many2one('tataru_secret_market.data_centers', index=True)
 
     @api.model
     def sync_worlds(self, starting):
