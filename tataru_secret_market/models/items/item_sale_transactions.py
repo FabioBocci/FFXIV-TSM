@@ -31,7 +31,7 @@ class ItemSaleTransactions(models.Model):
         is_more_then_one = len(items) > 1
         items_str = ",".join([str(item.unique_id) for item in items]) if is_more_then_one else str(items[0].unique_id)
         try:
-            res = requests.get(f"https://universalis.app/api/v2/history/{world.name}/{items_str}")
+            res = requests.get(f"https://universalis.app/api/v2/history/{world.name}/{items_str}?entriesToReturn=500&minSalePrice=0&maxSalePrice=2147483647")
             res.raise_for_status()
         except requests.exceptions.HTTPError as err:
             raise Exception(err)
