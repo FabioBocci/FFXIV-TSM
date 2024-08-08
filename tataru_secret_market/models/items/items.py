@@ -11,6 +11,7 @@ class Items(models.Model):
     name = fields.Char()
     sellable = fields.Boolean()
     craftable = fields.Boolean(index=True, store=True)
+    used_for_crafting = fields.Boolean(compute='_compute_used_for_crafting', store=True)
     item_icon = fields.Char()
     item_icon_hd = fields.Char()
     crafting_recipe_ids = fields.One2many('tataru_secret_market.item_recipe', 'result_item_id')
@@ -42,6 +43,11 @@ class Items(models.Model):
             record.transactions_count_last_24h = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=1))))
             record.transactions_count_last_7d = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=7))))
             record.mostly_hq = len(record.transactions_ids.filtered(lambda x: x.high_quality)) / len(record.transactions_ids) > require_hq_percentage if len(record.transactions_ids) > 0 else False
+
+    @api.depends('ingredients_ids')
+    def _compute_used_for_crafting(self):
+        for record in self:
+            record.used_for_crafting = len(record.ingredients_ids) > 0
 
     @api.model
     def sync_items(self):

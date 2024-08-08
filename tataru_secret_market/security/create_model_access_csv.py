@@ -34,9 +34,9 @@ MODELS = (
 # 1 livello => chiave ruolo
 # 2 livello => lista con la seguente struttura: (modulo, nome gruppo)
 ROLES = {
-    "admin": ("base", "group_user"),
-    "manager": ("base", "group_user"),
-    "reader": ("base", "group_user"),
+    "admin": ("tataru_secret_market", "group_tsm_admin"),
+    "manager": ("tataru_secret_market", "group_tsm_manager"),
+    "reader": ("tataru_secret_market", "group_tsm_user"),
 }
 
 

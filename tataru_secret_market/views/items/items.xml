@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <tree string="Items">
                 <field name="item_icon" string="Icon URL" widget="image_url" class="o_field_image oe_avatar"/>
-                <field name="unique_id"/>
+                <field name="unique_id" widget="text"/>
                 <field name="name"/>
                 <field name="sellable"/>
                 <field name="craftable"/>
@@ -22,7 +22,7 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile" sample="1">
                 <field name="item_icon_hd" string="Icon URL" widget="image_url" class="o_field_image oe_avatar"/>
-                <field name="unique_id"/>
+                <field name="unique_id" widget="text"/>
                 <field name="name"/>
                 <field name="sellable"/>
                 <field name="craftable"/>
@@ -41,7 +41,7 @@
                                 <div class="col-6">
                                     <div>
                                         <strong>
-                                        ID:  <field name="unique_id"/>
+                                        ID:  <field name="unique_id" widget="text"/>
                                         </strong>
                                     </div>
                                     <div>
@@ -73,10 +73,11 @@
                 </header>
                 <group>
                     <group>
-                        <field name="unique_id" readonly="1"/>
+                        <field name="unique_id" readonly="1" widget="text"/>
                         <field name="name"/>
                         <field name="sellable"/>
                         <field name="craftable"/>
+                        <field name="used_for_crafting" invisible="1"/>
                     </group>
                     <group>
                         <field name="item_icon_hd" widget="image_url" class="o_field_image oe_avatar"/>
@@ -87,15 +88,13 @@
                     <page string="Description">
 
                     </page>
-                    <page string="Crafting">
-                    </page>
-                    <page string="Transactions">
+                    <page string="Transactions" attrs="{'invisible': [('sellable', '=', False)]}">
                         <group>
                             <field name="transactions_count_last_24h" string="Transactions in the last 24h"/>
                             <field name="transactions_count_last_7d" string="Transactions in the last 7d"/>
                         </group>
                         <group>
-                            <field name="transactions_ids" string= "">
+                            <field name="transactions_ids" nolabel="1" colspan="2" default_order="sale_date desc">
                                 <tree>
                                     <field name="sale_date"/>
                                     <field name="buyer_name"/>
@@ -108,9 +107,9 @@
                         </group>
                         <button name="sync_item_transactions" string="Sync Transactions" type="object" class="btn btn-primary"/>
                     </page>
-                    <page string="Market Availability">
+                    <page string="Market Availability" attrs="{'invisible': [('sellable', '=', False)]}">
                         <group>
-                            <field name="availability_ids" string= "">
+                            <field name="availability_ids" nolabel="1" colspan="2">
                                 <tree>
                                     <field name="world_id"/>
                                     <field name="price"/>
@@ -123,16 +122,54 @@
                         </group>
                         <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"/>
                     </page>
-                    <page string="Crafting">
-                        <group string="Crafted by">
-                            <field name="crafting_recipe_ids" readonly="1" options='{"show_string": False}'/>
-                        </group>
-                        <group string="Used For:">
-                            <field name="ingredients_ids" string= "" options='{"show_string": False}'>
+                    <page string="Crafting" attrs="{'invisible': [('craftable', '=', False),('used_for_crafting', '=', False)]}">
+                        <group string="Crafted by" attrs="{'invisible': [('craftable', '=', False)]}">
+                            <field name="crafting_recipe_ids" nolabel="1" colspan="2" attrs="{'invisible': [('crafting_recipe_ids', '=', False)]}">
+                                <form string="Crafting">
+                                    <field name="item_icon" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                                    <group>
+                                        <field name="unique_id" widget="text"/>
+                                        <field name="name"/>
+                                        <field name="job_id"/>
+                                        <field name="level_required"/>
+                                    </group>
+                                    <field name="ingredients_ids" >
+                                        <tree>
+                                            <field name="item_icon" widget="image_url"/>
+                                            <field name="name"/>
+                                            <field name="item_id"/>
+                                            <field name="quantity"/>
+                                        </tree>
+                                    </field>
+                                </form>
                                 <tree>
-                                    <field name="recipe_id" />
-                                    <field name="quantity" />
+                                    <field name="item_icon" widget="image_url" class="o_field_image"/>
+                                    <field name="result_item_id"/>
+                                    <field name="job_id"/>
+                                    <field name="level_required"/>
+                                    <field name="name"/>
+                                    <field name="unique_id" widget="text"/>
                                 </tree>
+                            </field>
+                        </group>
+                        <group string="Used For:" attrs="{'invisible': [('used_for_crafting', '=', False)]}" >
+                            <field name="ingredients_ids" nolabel="1" colspan="2" attrs="{'invisible': [('ingredients_ids', '=', False)]}">
+                                <tree>
+                                    <field name="recipe_icon" widget="image_url" class="o_field_image"/>
+                                    <field name="recipe_name" />
+                                    <field name="quantity" />
+                                    <field name="recipe_sellable" />
+                                    <field name="recipe_job_id" />
+                                    <field name="recipe_level_required" />
+                                </tree>
+                                <form string="Crafting">
+                                    <field name="recipe_icon_hd" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                                    <group>
+                                        <field name="recipe_id"/>
+                                        <field name="recipe_job_id"/>
+                                        <field name="recipe_level_required"/>
+                                    </group>
+                                </form>
                             </field>
                         </group>
                         <button name="sync_item_recipe" string="Sync Recipe" type="object" class="btn btn-primary"/>

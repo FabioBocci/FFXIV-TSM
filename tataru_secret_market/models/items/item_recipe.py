@@ -20,6 +20,8 @@ class ItemRecipe(models.Model):
 
     name = fields.Char(compute="_compute_name")
     sellable = fields.Boolean(related="result_item_id.sellable")
+    item_icon = fields.Char(related="result_item_id.item_icon")
+    item_icon_hd = fields.Char(related="result_item_id.item_icon_hd")
 
     @api.depends("result_item_id")
     def _compute_name(self):
@@ -92,3 +94,19 @@ class ItemIngredient(models.Model):
     quantity = fields.Integer()
 
     recipe_id = fields.Many2one("tataru_secret_market.item_recipe")
+
+    # item fields
+    item_icon = fields.Char(related="item_id.item_icon")
+    item_icon_hd = fields.Char(related="item_id.item_icon_hd")
+    name = fields.Char(related="item_id.name")
+    item_is_craftable = fields.Boolean(related="item_id.craftable")
+    item_sellable = fields.Boolean(related="item_id.sellable")
+
+    # recipe fields
+    recipe_icon = fields.Char(related="recipe_id.item_icon")
+    recipe_icon_hd = fields.Char(related="recipe_id.item_icon_hd")
+    recipe_name = fields.Char(related="recipe_id.name")
+    recipe_sellable = fields.Boolean(related="recipe_id.sellable")
+    recipe_job_id = fields.Many2one(related="recipe_id.job_id")
+    recipe_level_required = fields.Integer(related="recipe_id.level_required")
+    # recipe_full_ingredients = fields.one2many("tataru_secret_market.item_ingredient", related="recipe_id.ingredients_ids")

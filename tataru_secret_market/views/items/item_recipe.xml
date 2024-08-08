@@ -1,0 +1,63 @@
+<odoo>
+    <!-- Form View for ItemRecipe -->
+    <record id="view_tataru_secret_market_item_recipe_form" model="ir.ui.view">
+        <field name="name">tataru.secret.market.item.recipe.form</field>
+        <field name="model">tataru_secret_market.item_recipe</field>
+        <field name="arch" type="xml">
+            <form string="Item Recipe">
+                <sheet>
+					<field name="item_icon_hd" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                    <group>
+                        <field name="unique_id" widget="text"/>
+                        <field name="name"/>
+                        <field name="job_id"/>
+                        <field name="level_required"/>
+                    </group>
+                    <group>
+                        <field name="result_item_id"/>
+                        <field name="sellable" readonly="1"/>
+                    </group>
+                    <group string="Ingredients">
+                        <field name="ingredients_ids" nolabel="1" colspan="2">
+                            <tree>
+                                <field name="item_icon" widget="image_url"/>
+                                <field name="name"/>
+                                <field name="item_id"/>
+                                <field name="quantity"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View for ItemRecipe -->
+    <record id="view_tataru_secret_market_item_recipe_tree" model="ir.ui.view">
+        <field name="name">tataru.secret.market.item.recipe.tree</field>
+        <field name="model">tataru_secret_market.item_recipe</field>
+        <field name="arch" type="xml">
+            <tree string="Item Recipes">
+                <field name="item_icon" widget="image_url" class="o_field_image"/>
+                <field name="result_item_id"/>
+                <field name="job_id"/>
+                <field name="level_required"/>
+                <field name="name"/>
+                <field name="unique_id" widget="text"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action to Open ItemRecipe Views -->
+    <record id="action_tataru_secret_market_item_recipe" model="ir.actions.act_window">
+        <field name="name">Item Recipes</field>
+        <field name="res_model">tataru_secret_market.item_recipe</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu Item to Access Item Recipes -->
+    <menuitem id="item_recipe"
+              name="Item Recipes"
+              parent="menu_items"
+              action="action_tataru_secret_market_item_recipe"/>
+</odoo>

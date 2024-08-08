@@ -20,7 +20,9 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        "security/security.xml",
         "views/items/items.xml",
+        "views/items/item_recipe.xml",
         "views/general/data_centers.xml",
         "views/general/worlds.xml",
         "views/opportunity/opportunity.xml",
