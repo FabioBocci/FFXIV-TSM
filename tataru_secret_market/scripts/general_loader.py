@@ -1,4 +1,5 @@
 from odoo import models, api, fields
+from odoo.addons.queue_job.delay import group
 import datetime
 
 
@@ -62,10 +63,10 @@ class GeneralLoader(models.AbstractModel):
             time += datetime.timedelta(seconds=5)
 
     @api.model
-    def sync_items_transactions_job(self, items):
+    def sync_items_transactions_job(self, items, block_oppotunities_calculation=False):
         current_world = self.env["tataru_secret_market.worlds"].get_current_world()
         transactions_model = self.env["tataru_secret_market.item_sale_transactions"]
-        transactions_model.sync_item_transactions(items, current_world)
+        transactions_model.with_context(ignore_calculation=block_oppotunities_calculation).sync_item_transactions(items, current_world)
         items.last_time_sync_transactions = fields.Datetime.now()
 
         return "Transactions synced for: {}".format("\n".join(item.name for item in items))
@@ -97,10 +98,10 @@ class GeneralLoader(models.AbstractModel):
             time += datetime.timedelta(seconds=5)
 
     @api.model
-    def sync_items_availability_job(self, items):
+    def sync_items_availability_job(self, items, block_oppotunities_calculation=False):
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
         availability_model = self.env['tataru_secret_market.item_availability']
-        availability_model.sync_item_availability(items, current_world.data_center_id)
+        availability_model.with_context(ignore_calculation=block_oppotunities_calculation).sync_item_availability(items, current_world.data_center_id)
         items.last_time_sync_availability = fields.Datetime.now()
 
         return "Availability synced for: {}".format("\n".join(item.name for item in items))
@@ -220,10 +221,19 @@ class GeneralLoader(models.AbstractModel):
         batch = self.env["queue.job.batch"].get_new_batch("Update opportunities")
         time = fields.Datetime.now()
         for opportunity_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay(eta=time).sync_items_availability_job(opportunity_batch)
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay(eta=time).sync_items_transactions_job(opportunity_batch)
+            job_group = group(self.delayable().with_context(job_batch_id=batch).set(eta=time).sync_items_availability_job(opportunity_batch, True),
+                              self.delayable().with_context(job_batch_id=batch).set(eta=time).sync_items_transactions_job(opportunity_batch, True))
+            update_calc = self.delayable().update_opportunity_calcs(opportunity_batch)
+            job_group.on_done(update_calc).delay()
+            # self.with_context(
+            #     job_batch_id=batch
+            # ).with_delay(eta=time).sync_items_availability_job(opportunity_batch, True)
+            # self.with_context(
+            #     job_batch_id=batch
+            # ).with_delay(eta=time).sync_items_transactions_job(opportunity_batch, True)
             time += datetime.timedelta(seconds=5)
+
+    @api.model
+    def update_opportunity_calcs(self, items):
+        self.env["tataru_secret_market.item_opportunity"].search([("item_id", "in", items.ids)]).action_compute_all()
+        return "Opportunities updated"

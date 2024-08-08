@@ -5,10 +5,14 @@
         <field name="name">item.opportunity.tree</field>
         <field name="model">tataru_secret_market.item_opportunity</field>
         <field name="arch" type="xml">
-            <tree string="Item Opportunities">
-				<field name="item_icon" string="Icon" widget="image_url" class="o_field_image oe_avatar"/>
+            <tree string="Item Opportunities"
+                decoration-primary="opportunity_type == 'craft'"
+                decoration-success="opportunity_type == 'buy'"
+                decoration-danger="opportunity_type == 'none'" class="tree_opportunity">
+                <field name="item_icon" string="Icon" widget="image_url" class="o_field_image oe_avatar"/>
                 <field name="item_id"/>
                 <field name="opportunity_percentage" widget="percentage"/>
+                <field name="opportunity_type"/>
                 <field name="price_to_sell"/>
                 <field name="price_to_buy"/>
                 <field name="price_to_craft"/>
@@ -16,6 +20,7 @@
             </tree>
         </field>
     </record>
+
 
     <!-- Form view for Item Opportunities -->
     <record id="view_item_opportunity_form" model="ir.ui.view">

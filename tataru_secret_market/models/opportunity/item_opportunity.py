@@ -16,6 +16,11 @@ class ItemOpportunity(models.Model):
     price_to_craft = fields.Float(compute='_compute_price_to_craft', store=True)
 
     opportunity_percentage = fields.Float(compute="_compute_opportunity_percentage", store=True)
+    opportunity_type = fields.Selection([
+        ('none', 'None'),
+        ('buy', 'Buy'),
+        ('craft', 'Craft'),
+    ], compute='_compute_opportunity_percentage', store=True)
 
     item_crafting = fields.One2many(related='item_id.crafting_recipe_ids')
     item_availability = fields.One2many(related='item_id.availability_ids')
@@ -39,6 +44,9 @@ class ItemOpportunity(models.Model):
 
     @api.depends('item_id', "item_id.transactions_ids")
     def _compute_price_to_sell(self):
+        if self.env.context.get('ignore_calculation', False):
+            return
+
         for record in self:
             if not record.item_id or len(record.item_id.transactions_ids) <= 0:
                 record.price_to_sell = -1
@@ -50,6 +58,9 @@ class ItemOpportunity(models.Model):
 
     @api.depends('item_id', "item_id.availability_ids")
     def _compute_price_to_buy(self):
+        if self.env.context.get('ignore_calculation', False):
+            return
+
         current_world = self.env['tataru_secret_market.worlds'].get_current_world()
         for record in self:
             if not record.item_id or len(record.item_id.availability_ids) <= 0:
@@ -67,6 +78,9 @@ class ItemOpportunity(models.Model):
 
     @api.depends('item_id', "item_id.crafting_recipe_ids", "item_id.crafting_recipe_ids.ingredients_ids", "item_id.crafting_recipe_ids.ingredients_ids.item_id", "item_id.crafting_recipe_ids.ingredients_ids.item_id.availability_ids")
     def _compute_price_to_craft(self):
+        if self.env.context.get('ignore_calculation', False):
+            return
+
         for record in self:
             if not record.item_id or len(record.item_id.crafting_recipe_ids) <= 0:
                 record.price_to_craft = -1
@@ -90,27 +104,38 @@ class ItemOpportunity(models.Model):
 
     @api.depends('price_to_sell', 'price_to_buy', 'price_to_craft')
     def _compute_opportunity_percentage(self):
+        if self.env.context.get('ignore_calculation', False):
+            return
+
         for record in self:
             if record.price_to_sell <= 0:
                 record.opportunity_percentage = 0
+                record.opportunity_type = 'none'
                 continue
             if record.price_to_buy <= 0 and record.price_to_craft <= 0:
                 record.opportunity_percentage = 0
+                record.opportunity_type = 'none'
             elif record.price_to_buy > 0 and record.price_to_craft <= 0:
                 if record.price_to_sell <= record.price_to_buy:
                     record.opportunity_percentage = 0
+                    record.opportunity_type = 'none'
                 else:
                     record.opportunity_percentage = 1 - record.price_to_buy / record.price_to_sell
+                    record.opportunity_type = 'buy'
             elif record.price_to_craft > 0 and record.price_to_buy <= 0:
                 if record.price_to_sell <= record.price_to_craft:
                     record.opportunity_percentage = 0
+                    record.opportunity_type = 'none'
                 else:
                     record.opportunity_percentage = 1 - record.price_to_craft / record.price_to_sell
+                    record.opportunity_type = 'craft'
             else:
                 if record.price_to_sell <= min(record.price_to_craft, record.price_to_buy):
                     record.opportunity_percentage = 0
+                    record.opportunity_type = 'none'
 
                 record.opportunity_percentage = 1 - min(
                     record.price_to_craft / record.price_to_sell,
                     record.price_to_buy / record.price_to_sell,
                 )
+                record.opportunity_type = 'craft' if record.price_to_craft < record.price_to_buy else 'buy'
