@@ -53,6 +53,7 @@ Percentage of Opportunity: **{int(self.opportunity_percentage * 100)}%**
 Avg. Selling Price: **{int(self.price_to_sell)}**
 Type Opportunity: **{self.opportunity_type}**
 {self.__get_opportunity_text()}
+--------------------------------------------------------------------------------
         """
         return message
 
