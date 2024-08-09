@@ -64,18 +64,20 @@ Type Opportunity: **{self.opportunity_type}**
             text = opportunity.__convert_to_discord_text()
             # TODO - è possibile che il text sia troppo lungo per discord ed andrebbe diviso in messaggi più piccoli
             discord_channels.send_message(f"MSG - Update Discord Opportunity {opportunity.name}", text, False)
-            # opportunity.last_time_send_on_discord = fields.Datetime.now()
+            opportunity.last_time_send_on_discord = fields.Datetime.now()
 
     @api.model
     def cron_send_opportunities(self):
         opportunities = self.env["tataru_secret_market.item_opportunity"].search([
             "&",
             "&",
+            "&",
+            ("opportunity_percentage", "<", 0.9),
+            ("send_this_opportunity", "=", True),
+            ("opportunity_type", "=", "buy"),
             "|",
             ("last_time_send_on_discord", "=", False),
-            ("last_time_send_on_discord", "<", fields.Datetime.now() - datetime.timedelta(days=1))
-            ("send_this_opportunity", "=", True),
-            ("opportunity_percentage", "<", 0.9)
+            ("last_time_send_on_discord", "<", fields.Datetime.now() - datetime.timedelta(hours=12))
         ], limit=10, order="opportunity_percentage DESC")
         discord_channels = self.env['discord.channel'].get_target_channels_for_tsm_message()
         self.env["tataru_secret_market.item_opportunity"].send_opportunities_to_discord(opportunities, discord_channels)
