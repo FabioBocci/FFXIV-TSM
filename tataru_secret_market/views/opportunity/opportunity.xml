@@ -48,14 +48,14 @@
                 </group>
 
                 <notebook>
-                    <page string="Crafting">
+                    <page string="Crafting" name="crafting">
                         <field name="item_crafting">
                             <tree string="Item Crafting">
                                 <field name="result_item_id"/>
                             </tree>
                         </field>
                     </page>
-                    <page string="Availability">
+                    <page string="Availability" name="availability">
                         <field name="item_availability" nolabel="1" colspan="2">
                             <tree>
                                 <field name="world_id"/>

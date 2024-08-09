@@ -43,6 +43,10 @@ class ItemOpportunity(models.Model):
             record._compute_price_to_craft()
             record._compute_opportunity_percentage()
 
+    def get_availability_filtered(self, world_id):
+        self.ensure_one()
+        return self.item_availability.filtered(lambda x: x.price > 0 and world_id.id != x.world_id.id and (not self.need_high_quality or x.high_quality))
+
     @api.depends('item_id', "item_id.transactions_ids")
     def _compute_price_to_sell(self):
         if self.env.context.get('ignore_calculation', False):
@@ -67,11 +71,7 @@ class ItemOpportunity(models.Model):
             if not record.item_id or len(record.item_id.availability_ids) <= 0:
                 record.price_to_buy = -1
                 continue
-            filtered_availabilities = record.item_availability.filtered(
-                lambda x: (
-                    x.price > 0 and current_world.id != x.world_id.id and (not record.need_high_quality or x.high_quality)
-                )
-            )
+            filtered_availabilities = record.get_availability_filtered(current_world)
             if filtered_availabilities:
                 record.price_to_buy = filtered_availabilities.sorted('price')[0].price
             else:

@@ -1,60 +1,45 @@
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
-<!--
-    <record model="ir.ui.view" id="tsm_x_discord.list">
-      <field name="name">tsm_x_discord list</field>
-      <field name="model">tsm_x_discord.tsm_x_discord</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </tree>
-      </field>
-    </record>
--->
+  <record model="ir.ui.view" id="view_discord_channel">
+    <field name="name">Add Selected Field </field>
+    <field name="inherit_id" ref="discord_base.discord_channel_form_view" />
+    <field name="model">discord.channel</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//notebook/page" position="after">
+            <page name="tsm" string="TSM">
+              <group>
+                  <field name="target_for_messages" string="Send Market Update" />
+              </group>
+            </page>
+        </xpath>
+    </field>
+  </record>
 
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="tsm_x_discord.action_window">
-      <field name="name">tsm_x_discord window</field>
-      <field name="res_model">tsm_x_discord.tsm_x_discord</field>
-      <field name="view_mode">tree,form</field>
-    </record>
--->
+  <record model="ir.ui.view" id="view_opportunity_item_discord">
+    <field name="name">Page for Discord</field>
+    <field name="inherit_id" ref="tataru_secret_market.view_item_opportunity_form" />
+    <field name="model">tataru_secret_market.item_opportunity</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//page[@name='availability']" position="after">
+            <page name="discord" string="Discord">
+              <group>
+                  <field name="send_this_opportunity" string="Send Market to Discord" />
+                  <field name="last_time_send_on_discord" string="Send Market Update" readonly="1"/>
+              </group>
+            </page>
+        </xpath>
+    </field>
+  </record>
 
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="tsm_x_discord.action_server">
-      <field name="name">tsm_x_discord server</field>
-      <field name="model_id" ref="model_tsm_x_discord_tsm_x_discord"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": model._name,
-        }
-      </field>
-    </record>
--->
-
-    <!-- Top menu item -->
-<!--
-    <menuitem name="tsm_x_discord" id="tsm_x_discord.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
-    <menuitem name="Menu 1" id="tsm_x_discord.menu_1" parent="tsm_x_discord.menu_root"/>
-    <menuitem name="Menu 2" id="tsm_x_discord.menu_2" parent="tsm_x_discord.menu_root"/>
--->
-    <!-- actions -->
-<!--
-    <menuitem name="List" id="tsm_x_discord.menu_1_list" parent="tsm_x_discord.menu_1"
-              action="tsm_x_discord.action_window"/>
-    <menuitem name="Server to list" id="tsm_x_discord" parent="tsm_x_discord.menu_2"
-              action="tsm_x_discord.action_server"/>
--->
-  </data>
+  <!-- Server Action to Set send_this_opportunity to False -->
+  <record id="action_set_send_this_opportunity_false" model="ir.actions.server">
+    <field name="name">Set Send discord to False</field>
+    <field name="model_id" ref="model_tataru_secret_market_item_opportunity"/>
+    <field name="state">code</field>
+    <field name="code">
+        if records:
+            records.write({'send_this_opportunity': False})
+    </field>
+  </record>
 </odoo>

@@ -1,0 +1,14 @@
+<odoo>
+    <!-- Cron to send message to Discord -->
+    <record id="ir_cron_tsm_x_discord_send_message_update" model="ir.cron">
+        <field name="name">TSM x Discord: send update to discord channels</field>
+        <field name="model_id" ref="tsm_x_discord.model_tataru_secret_market_item_opportunity" /> <!-- Correct reference to the ir.model -->
+        <field name="state">code</field>
+        <field name="code">model.cron_send_opportunities()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True" />
+    </record>
+</odoo>
