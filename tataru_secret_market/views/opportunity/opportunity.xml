@@ -12,7 +12,7 @@
                 <field name="item_icon" string="Icon" widget="image_url" class="o_field_image oe_avatar"/>
                 <field name="item_id"/>
                 <field name="opportunity_percentage" widget="percentage"/>
-                <field name="opportunity_type"/>
+                <field name="opportunity_type" widget="badge"/>
                 <field name="price_to_sell"/>
                 <field name="price_to_buy"/>
                 <field name="price_to_craft"/>
@@ -31,7 +31,6 @@
 				<header>
 					<button name="action_compute_all" string="Reload" type="object" class="btn btn-primary"/>
 				</header>
-
                 <group col="2">
 					<group>
 						<field name="item_id"/>
@@ -40,6 +39,7 @@
 						<field name="price_to_buy"/>
 						<field name="price_to_craft"/>
 						<field name="opportunity_percentage"/>
+						<field name="opportunity_type" widget="badge"/>
 						<field name="last_time_in_list_of_transactions" readonly="1"/>
 					</group>
 					<group>
@@ -56,9 +56,14 @@
                         </field>
                     </page>
                     <page string="Availability">
-                        <field name="item_availability">
-                            <tree string="Item Availability">
-                                <field name="item_id"/>
+                        <field name="item_availability" nolabel="1" colspan="2">
+                            <tree>
+                                <field name="world_id"/>
+                                <field name="price"/>
+                                <field name="quantity"/>
+                                <field name="total_price_with_tax"/>
+                                <field name="high_quality"/>
+                                <field name="reteiner_name"/>
                             </tree>
                         </field>
                     </page>
@@ -94,6 +99,5 @@
         </field>
     </record>
 
-    <!-- Menu item for Item Opportunities -->
-    <menuitem id="menu_item_opportunity" name="Item Opportunities" action="action_item_opportunity"/>
+
 </odoo>

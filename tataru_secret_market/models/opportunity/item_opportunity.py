@@ -5,6 +5,7 @@ class ItemOpportunity(models.Model):
     _name = 'tataru_secret_market.item_opportunity'
     _order = 'opportunity_percentage desc'
 
+    name = fields.Char(related='item_id.name')
     item_id = fields.Many2one('tataru_secret_market.items', string='Item')
     need_high_quality = fields.Boolean(related='item_id.mostly_hq')
 

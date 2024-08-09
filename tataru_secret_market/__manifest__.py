@@ -23,10 +23,13 @@
         'security/ir.model.access.csv',
         "views/items/items.xml",
         "views/items/item_recipe.xml",
+        "views/items/item_availability.xml",
+        "views/items/item_transactions.xml",
         "views/general/data_centers.xml",
         "views/general/worlds.xml",
         "views/opportunity/opportunity.xml",
         "scripts/scheduler.xml",
+        "views/main.xml",
     ],
 
     "asserts": {

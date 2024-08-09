@@ -55,9 +55,5 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- Menu Item to Access Item Recipes -->
-    <menuitem id="item_recipe"
-              name="Item Recipes"
-              parent="menu_items"
-              action="action_tataru_secret_market_item_recipe"/>
+
 </odoo>

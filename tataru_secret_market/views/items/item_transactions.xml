@@ -1,0 +1,57 @@
+<odoo>
+    <!-- Form View for ItemSaleTransactions -->
+    <record id="view_tataru_secret_market_item_sale_transactions_form" model="ir.ui.view">
+        <field name="name">tataru.secret.market.item.sale.transactions.form</field>
+        <field name="model">tataru_secret_market.item_sale_transactions</field>
+        <field name="arch" type="xml">
+            <form string="Item Sale Transaction">
+                <sheet>
+					<field name="item_icon_hd" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                    <!-- General Information -->
+                    <group>
+                        <field name="item_selled"/>
+                        <field name="world_id"/>
+                        <field name="buyer_name"/>
+                        <field name="sale_date"/>
+                        <field name="sale_date_timestamp" readonly="1"/>
+                    </group>
+                    <!-- Sale Information -->
+                    <group>
+                        <field name="price"/>
+                        <field name="quantity"/>
+                        <field name="high_quality"/>
+                        <field name="total_price" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View for ItemSaleTransactions -->
+    <record id="view_tataru_secret_market_item_sale_transactions_tree" model="ir.ui.view">
+        <field name="name">tataru.secret.market.item.sale.transactions.tree</field>
+        <field name="model">tataru_secret_market.item_sale_transactions</field>
+        <field name="arch" type="xml">
+            <tree string="Item Sale Transactions">
+                <field name="item_icon" widget="image_url" class="o_field_image"/>
+                <field name="item_selled"/>
+                <field name="world_id"/>
+                <field name="buyer_name"/>
+                <field name="sale_date"/>
+                <field name="price"/>
+                <field name="quantity"/>
+                <field name="total_price" readonly="1"/>
+                <field name="high_quality"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action to Open ItemSaleTransactions Views -->
+    <record id="action_tataru_secret_market_item_sale_transactions" model="ir.actions.act_window">
+        <field name="name">Item Sale Transactions</field>
+        <field name="res_model">tataru_secret_market.item_sale_transactions</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+</odoo>

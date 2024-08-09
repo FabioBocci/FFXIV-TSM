@@ -26,30 +26,48 @@
                 <field name="name"/>
                 <field name="sellable"/>
                 <field name="craftable"/>
+                <field name="used_for_crafting"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="row">
-                                <div class="col-12">
-                                    <strong>
-                                        <field name="name"/>
-                                    </strong>
-                                </div>
-                            </div>
-                            <hr class="mt8 mb8"/>
-                            <div class="row">
-                                <div class="col-6">
+                                <div class="col-12" style="display:flex; justify-content:space-between;">
                                     <div>
                                         <strong>
-                                        ID:  <field name="unique_id" widget="text"/>
+                                            <field name="name"/>
                                         </strong>
                                     </div>
                                     <div>
-                                      Sellable:  <field name="sellable" string="Sellable"/> <br/>
-                                      Craftable:  <field name="craftable" string="Craftable"/> <br/>
+                                        <strong>
+                                            <field name="unique_id" widget="text"/>
+                                        </strong>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                            </div>
+                            <hr class="mt8 mb8"/>
+                            <div style="display:flex; justify-content:space-between;">
+                                <div>
+                                <style type="text/css">
+                                    .td_space {
+                                        padding: 0 20px;
+                                    }
+                                </style>
+                                    <table>
+                                        <tr>
+                                            <td>Sellable:</td>
+                                            <td class="td_space"><field name="sellable" string="Sellable"/> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Craftable:</td>
+                                            <td class="td_space"><field name="craftable" string="Craftable"/> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ingredient:</td>
+                                            <td class="td_space"><field name="used_for_crafting" string="used_for_crafting"/> </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div>
                                     <field name="item_icon_hd" string="Icon URL" widget="image_url" class="o_kanban_image me-1 o_image_64_container"/>
                                 </div>
                             </div>
@@ -67,114 +85,121 @@
         <field name="arch" type="xml">
             <form string="Items">
                 <header>
-                    <button name="sync_items" string="Sync Items" type="object" class="btn btn-primary"/>
-                    <button name="sync_item_full_data" string="Sync Item FULL Data" type="object" class="btn btn-primary"/>
-                    <button name="action_sync_item_data" string="Sync Item Data" type="object" class="btn btn-primary"/>
+                    <button name="sync_items" string="Sync Items" type="object" class="btn btn-primary" groups="tataru_secret_market.group_tsm_admin"/>
+                    <button name="sync_item_full_data" string="Sync Item FULL Data" type="object" class="btn btn-primary" groups="tataru_secret_market.group_tsm_manager"/>
+                    <button name="action_sync_item_data" string="Sync Item Data" type="object" class="btn btn-primary" groups="tataru_secret_market.group_tsm_manager"/>
                 </header>
-                <group>
+                <sheet>
+                    <field name="item_icon_hd" widget="image_url" nolabel="1"  class="o_field_image oe_avatar"/>
                     <group>
                         <field name="unique_id" readonly="1" widget="text"/>
-                        <field name="name"/>
-                        <field name="sellable"/>
-                        <field name="craftable"/>
+                        <field name="name" readonly="1"/>
+                        <field name="sellable" invisible="1"/>
+                        <field name="craftable" invisible="1"/>
                         <field name="used_for_crafting" invisible="1"/>
                     </group>
-                    <group>
-                        <field name="item_icon_hd" widget="image_url" class="o_field_image oe_avatar"/>
-                    </group>
-                </group>
-
-                <notebook>
-                    <page string="Description">
-
-                    </page>
-                    <page string="Transactions" attrs="{'invisible': [('sellable', '=', False)]}">
-                        <group>
-                            <field name="transactions_count_last_24h" string="Transactions in the last 24h"/>
-                            <field name="transactions_count_last_7d" string="Transactions in the last 7d"/>
-                        </group>
-                        <group>
-                            <field name="transactions_ids" nolabel="1" colspan="2" default_order="sale_date desc">
-                                <tree>
-                                    <field name="sale_date"/>
-                                    <field name="buyer_name"/>
-                                    <field name="world_id"/>
-                                    <field name="quantity"/>
-                                    <field name="price"/>
-                                    <field name="total_price"/>
-                                </tree>
-                            </field>
-                        </group>
-                        <button name="sync_item_transactions" string="Sync Transactions" type="object" class="btn btn-primary"/>
-                    </page>
-                    <page string="Market Availability" attrs="{'invisible': [('sellable', '=', False)]}">
-                        <group>
-                            <field name="availability_ids" nolabel="1" colspan="2">
-                                <tree>
-                                    <field name="world_id"/>
-                                    <field name="price"/>
-                                    <field name="quantity"/>
-                                    <field name="total_price_with_tax"/>
-                                    <field name="high_quality"/>
-                                    <field name="reteiner_name"/>
-                                </tree>
-                            </field>
-                        </group>
-                        <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"/>
-                    </page>
-                    <page string="Crafting" attrs="{'invisible': [('craftable', '=', False),('used_for_crafting', '=', False)]}">
-                        <group string="Crafted by" attrs="{'invisible': [('craftable', '=', False)]}">
-                            <field name="crafting_recipe_ids" nolabel="1" colspan="2" attrs="{'invisible': [('crafting_recipe_ids', '=', False)]}">
-                                <form string="Crafting">
-                                    <field name="item_icon" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
-                                    <group>
-                                        <field name="unique_id" widget="text"/>
-                                        <field name="name"/>
+                    <notebook>
+                        <page string="Description">
+                            <!-- TODO - Template for descriptions and other fields -->
+                        </page>
+                        <page string="Transactions" attrs="{'invisible': [('sellable', '=', False)]}">
+                            <group col="2">
+                                <group>
+                                    <field name="transactions_count_last_24h" string="Transactions in the last 24h" readonly="1"/>
+                                    <field name="transactions_count_last_7d" string="Transactions in the last 7d" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="last_time_sync_transactions" string="Last Sync Transactions" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="transactions_ids" nolabel="1" colspan="2">
+                                    <tree default_order="sale_date desc">
+                                        <field name="sale_date"/>
+                                        <field name="buyer_name"/>
+                                        <field name="world_id"/>
+                                        <field name="quantity"/>
+                                        <field name="price"/>
+                                        <field name="total_price"/>
+                                        <field name="high_quality"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <button name="sync_item_transactions" string="Sync Transactions" type="object" class="btn btn-primary"  groups="tataru_secret_market.group_tsm_manager"/>
+                        </page>
+                        <page string="Market Availability" attrs="{'invisible': [('sellable', '=', False)]}">
+                            <group>
+                                <field name="availability_ids" nolabel="1" colspan="2">
+                                    <tree>
+                                        <field name="world_id"/>
+                                        <field name="price"/>
+                                        <field name="quantity"/>
+                                        <field name="total_price_with_tax"/>
+                                        <field name="high_quality"/>
+                                        <field name="reteiner_name"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group>
+                                <field name="last_time_sync_availability" string="Last Sync Availability" readonly="1"/>
+                            </group>
+                            <button name="sync_item_availability" string="Sync Availability" type="object" class="btn btn-primary"  groups="tataru_secret_market.group_tsm_manager"/>
+                        </page>
+                        <page string="Crafting" attrs="{'invisible': [('craftable', '=', False),('used_for_crafting', '=', False)]}">
+                            <group string="Crafted by" attrs="{'invisible': [('craftable', '=', False)]}">
+                                <field name="crafting_recipe_ids" nolabel="1" colspan="2" attrs="{'invisible': [('crafting_recipe_ids', '=', False)]}">
+                                    <form string="Crafting">
+                                        <field name="item_icon" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                                        <group>
+                                            <field name="unique_id" widget="text"/>
+                                            <field name="name"/>
+                                            <field name="job_id"/>
+                                            <field name="level_required"/>
+                                        </group>
+                                        <field name="ingredients_ids" >
+                                            <tree>
+                                                <field name="item_icon" widget="image_url"/>
+                                                <field name="name"/>
+                                                <field name="item_id"/>
+                                                <field name="quantity"/>
+                                            </tree>
+                                        </field>
+                                    </form>
+                                    <tree>
+                                        <field name="item_icon" widget="image_url" class="o_field_image"/>
+                                        <field name="result_item_id"/>
                                         <field name="job_id"/>
                                         <field name="level_required"/>
-                                    </group>
-                                    <field name="ingredients_ids" >
-                                        <tree>
-                                            <field name="item_icon" widget="image_url"/>
-                                            <field name="name"/>
-                                            <field name="item_id"/>
-                                            <field name="quantity"/>
-                                        </tree>
-                                    </field>
-                                </form>
-                                <tree>
-                                    <field name="item_icon" widget="image_url" class="o_field_image"/>
-                                    <field name="result_item_id"/>
-                                    <field name="job_id"/>
-                                    <field name="level_required"/>
-                                    <field name="name"/>
-                                    <field name="unique_id" widget="text"/>
-                                </tree>
-                            </field>
-                        </group>
-                        <group string="Used For:" attrs="{'invisible': [('used_for_crafting', '=', False)]}" >
-                            <field name="ingredients_ids" nolabel="1" colspan="2" attrs="{'invisible': [('ingredients_ids', '=', False)]}">
-                                <tree>
-                                    <field name="recipe_icon" widget="image_url" class="o_field_image"/>
-                                    <field name="recipe_name" />
-                                    <field name="quantity" />
-                                    <field name="recipe_sellable" />
-                                    <field name="recipe_job_id" />
-                                    <field name="recipe_level_required" />
-                                </tree>
-                                <form string="Crafting">
-                                    <field name="recipe_icon_hd" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
-                                    <group>
-                                        <field name="recipe_id"/>
-                                        <field name="recipe_job_id"/>
-                                        <field name="recipe_level_required"/>
-                                    </group>
-                                </form>
-                            </field>
-                        </group>
-                        <button name="sync_item_recipe" string="Sync Recipe" type="object" class="btn btn-primary"/>
-                    </page>
-                </notebook>
+                                        <field name="name"/>
+                                        <field name="unique_id" widget="text"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group string="Used For:" attrs="{'invisible': [('used_for_crafting', '=', False)]}" >
+                                <field name="ingredients_ids" nolabel="1" colspan="2" attrs="{'invisible': [('ingredients_ids', '=', False)]}">
+                                    <tree>
+                                        <field name="recipe_icon" widget="image_url" class="o_field_image"/>
+                                        <field name="recipe_name" />
+                                        <field name="quantity" />
+                                        <field name="recipe_sellable" />
+                                        <field name="recipe_job_id" />
+                                        <field name="recipe_level_required" />
+                                    </tree>
+                                    <form string="Crafting">
+                                        <field name="recipe_icon_hd" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                                        <group>
+                                            <field name="recipe_id"/>
+                                            <field name="recipe_job_id"/>
+                                            <field name="recipe_level_required"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </group>
+                            <button name="sync_item_recipe" string="Sync Recipe" type="object" class="btn btn-primary"  groups="tataru_secret_market.group_tsm_manager"/>
+                        </page>
+                    </notebook>
+
+                </sheet>
             </form>
         </field>
     </record>
@@ -221,6 +246,4 @@
         </field>
     </record>
 
-    <!-- Menu item for Items -->
-    <menuitem id="menu_items" name="Items" action="action_items" web_icon="tataru_secret_market,static/description/item_icon.png"/>
 </odoo>

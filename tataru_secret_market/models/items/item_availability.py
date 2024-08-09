@@ -31,6 +31,10 @@ class ItemAvailability(models.Model):
     reteiner_name = fields.Char(index=True)
     reteiner_id = fields.Char(index=True)
 
+    # Item related fields
+    item_icon = fields.Char(related='item_id.item_icon')
+    item_icon_hd = fields.Char(related='item_id.item_icon_hd')
+
     @api.depends('price', 'quantity', 'tax')
     def _compute_total_price(self):
         for record in self:

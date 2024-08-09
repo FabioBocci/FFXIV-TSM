@@ -21,6 +21,10 @@ class ItemSaleTransactions(models.Model):
     sale_date_timestamp = fields.Integer()
     total_price = fields.Integer(compute='_compute_total_price')
 
+    # item fields
+    item_icon = fields.Char(related='item_selled.item_icon')
+    item_icon_hd = fields.Char(related='item_selled.item_icon_hd')
+
     @api.depends('price', 'quantity')
     def _compute_total_price(self):
         for record in self:
@@ -47,7 +51,6 @@ class ItemSaleTransactions(models.Model):
                 continue
             self.__sync_item_transactions(item, world, item_json["entries"])
             item.last_time_sync_transactions = fields.Datetime.now()
-
 
     @api.model
     def __sync_item_transactions(self, item, world, entries):

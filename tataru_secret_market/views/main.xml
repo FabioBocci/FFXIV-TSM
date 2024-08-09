@@ -1,5 +1,28 @@
 <odoo>
 
 
+    <!-- Menu item for Items -->
+    <menuitem id="menu_items" name="Items" action="action_items" web_icon="tataru_secret_market,static/description/item_icon.png"/>
+
+	<!-- Menu Item to Access Item Recipes -->
+    <menuitem id="item_recipe"
+              name="Recipes"
+              parent="menu_items"
+              action="action_tataru_secret_market_item_recipe" groups="tataru_secret_market.group_tsm_manager"/>
+
+	<!-- Menu Item to Access Item Availability -->
+    <menuitem id="menu_tataru_secret_market_item_availability"
+              name="Availability"
+              parent="menu_items"
+              action="action_tataru_secret_market_item_availability" groups="tataru_secret_market.group_tsm_admin"/>
+
+	<!-- Menu Item to Access Item Sale Transactions -->
+    <menuitem id="menu_tataru_secret_market_item_sale_transactions"
+              name="Sale Transactions"
+              parent="menu_items"
+              action="action_tataru_secret_market_item_sale_transactions"  groups="tataru_secret_market.group_tsm_admin"/>
+
+	<!-- Menu item for Item Opportunities -->
+    <menuitem id="menu_item_opportunity" name="Item Opportunities" action="action_item_opportunity"/>
 
 </odoo>

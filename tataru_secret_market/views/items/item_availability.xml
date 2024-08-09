@@ -1,0 +1,62 @@
+<odoo>
+    <!-- Form View for ItemAvailability -->
+    <record id="view_tataru_secret_market_item_availability_form" model="ir.ui.view">
+        <field name="name">tataru.secret.market.item.availability.form</field>
+        <field name="model">tataru_secret_market.item_availability</field>
+        <field name="arch" type="xml">
+            <form string="Item Availability">
+                <sheet>
+					<field name="item_icon_hd" readonly="1" nolabel="1" widget="image_url" class="o_field_image oe_avatar"/>
+                    <!-- General Information -->
+                    <group string="General Information">
+                        <field name="item_id"/>
+                        <field name="world_id"/>
+                        <field name="data_center_id" readonly="1"/>
+                        <field name="listing_id"/>
+                    </group>
+                    <!-- Item Information -->
+                    <group string="Item Information">
+                        <field name="high_quality"/>
+                        <field name="price"/>
+                        <field name="quantity"/>
+                        <field name="tax"/>
+                        <field name="total_price" readonly="1"/>
+                        <field name="total_price_with_tax" readonly="1"/>
+                    </group>
+                    <!-- Retainer Information -->
+                    <group string="Retainer Information">
+                        <field name="reteiner_name"/>
+                        <field name="reteiner_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View for ItemAvailability -->
+    <record id="view_tataru_secret_market_item_availability_tree" model="ir.ui.view">
+        <field name="name">tataru.secret.market.item.availability.tree</field>
+        <field name="model">tataru_secret_market.item_availability</field>
+        <field name="arch" type="xml">
+            <tree string="Item Availability">
+				<field name="item_icon" widget="image_url" class="o_field_image"/>
+                <field name="item_id"/>
+                <field name="world_id"/>
+                <field name="high_quality"/>
+                <field name="price"/>
+                <field name="quantity"/>
+                <field name="total_price_with_tax"/>
+                <field name="reteiner_name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action to Open ItemAvailability Views -->
+    <record id="action_tataru_secret_market_item_availability" model="ir.actions.act_window">
+        <field name="name">Item Availability</field>
+        <field name="res_model">tataru_secret_market.item_availability</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+</odoo>
