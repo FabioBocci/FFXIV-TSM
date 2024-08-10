@@ -94,7 +94,9 @@ You can buy this item at a lower price than the average selling price. Here:
                 "&",
                 "&",
                 "&",
+                "&",
                 ("opportunity_percentage", "<", 0.9),
+                ("opportunity_percentage", ">", 0.3),
                 ("send_this_opportunity", "=", True),
                 ("opportunity_type", "=", "buy"),
                 "|",
@@ -105,7 +107,7 @@ You can buy this item at a lower price than the average selling price. Here:
                     fields.Datetime.now() - datetime.timedelta(hours=12),
                 ),
             ],
-            limit=1,
+            limit=5,
             order="opportunity_percentage DESC",
         )
         discord_channels = self.env[
