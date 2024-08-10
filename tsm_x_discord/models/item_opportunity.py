@@ -69,8 +69,7 @@ Avg. Selling Price: **{int(self.price_to_sell)}**
 Type Opportunity: **{self.opportunity_type}**
 You can buy this item at a lower price than the average selling price. Here:
 {self.__get_opportunity_text()}--------------------------------------------------------------------------------
-{image_url}
-        """
+{image_url}"""
         return message
 
     @api.model
