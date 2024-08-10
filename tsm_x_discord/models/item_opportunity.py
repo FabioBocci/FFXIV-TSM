@@ -60,7 +60,7 @@ class ItemOpportunity(models.Model):
     def __convert_to_discord_text(self, include_image_url=True):
         image_url = self._get_image_url() or "" if include_image_url else ""
         if len(image_url) > 0:
-            image_url = f"![Opportunity Image]({image_url})\n"
+            image_url = f"[Image]({image_url})"
         message = f"""{'Hello @ here, I have found a new opportunity for you!' if self.last_time_send_on_discord is False else 'Opportunity is still available! (Updated)'}
 Item: [{self.name}](<https://www.garlandtools.org/db/#item/{self.item_id.unique_id}>)
 [Universalis](<https://universalis.app/market/{self.item_id.unique_id}>)
