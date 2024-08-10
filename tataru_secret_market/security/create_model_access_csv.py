@@ -26,7 +26,8 @@ MODELS = (
     ('tataru_secret_market', 'tataru_secret_market.item_ingredient', {'admin': (1, 1, 1, 1),
                                             'manager': (1, 1, 1, 1), 'reader': (1, 0, 0, 0)}),
     ('tataru_secret_market', 'tataru_secret_market.item_opportunity', {'admin': (1, 1, 1, 1),
-                                            'manager': (1, 1, 1, 1), 'reader': (1, 0, 0, 0)}),
+                                            'manager': (1, 1, 1, 1), 'reader': (1, 0, 0, 0), 'public': (1, 0, 0, 0)}),
+
     )
 # fmt: on
 
@@ -37,6 +38,7 @@ ROLES = {
     "admin": ("tataru_secret_market", "group_tsm_admin"),
     "manager": ("tataru_secret_market", "group_tsm_manager"),
     "reader": ("tataru_secret_market", "group_tsm_user"),
+    "public": ("base", "group_public"),
 }
 
 

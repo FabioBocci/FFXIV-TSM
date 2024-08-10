@@ -116,6 +116,12 @@ class Items(models.Model):
                         "job_id": job_id.id,
                         "level_required": recipe['Level'],
                     })
+                else:
+                    recipe_id.write({
+                        'result_item_id': item_id.id,
+                        "job_id": job_id.id,
+                        "level_required": recipe['Level'],
+                    })
             update_dict['craftable'] = True
         item_id.write(update_dict)
         item_id.last_time_sync_data = fields.Datetime.now()

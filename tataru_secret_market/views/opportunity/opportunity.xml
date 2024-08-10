@@ -67,6 +67,9 @@
                             </tree>
                         </field>
                     </page>
+                    <page string="Image" name="image">
+                        <field name="opportunity_image" widget="image" />
+                    </page>
                 </notebook>
             </form>
         </field>
