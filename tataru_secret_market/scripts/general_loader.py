@@ -57,19 +57,23 @@ class GeneralLoader(models.AbstractModel):
         batch = self.env["queue.job.batch"].get_new_batch("Sync item transactions")
         time = fields.Datetime.now()
         for item_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay(eta=time).sync_items_transactions_job(item_batch)
+            self.with_context(job_batch_id=batch).with_delay(
+                eta=time
+            ).sync_items_transactions_job(item_batch)
             time += datetime.timedelta(seconds=5)
 
     @api.model
     def sync_items_transactions_job(self, items, block_oppotunities_calculation=False):
         current_world = self.env["tataru_secret_market.worlds"].get_current_world()
         transactions_model = self.env["tataru_secret_market.item_sale_transactions"]
-        transactions_model.with_context(ignore_calculation=block_oppotunities_calculation).sync_item_transactions(items, current_world)
+        transactions_model.with_context(
+            ignore_calculation=block_oppotunities_calculation
+        ).sync_item_transactions(items, current_world)
         items.last_time_sync_transactions = fields.Datetime.now()
 
-        return "Transactions synced for: {}".format("\n".join(item.name for item in items))
+        return "Transactions synced for: {}".format(
+            "\n".join(item.name for item in items)
+        )
 
     @api.model
     def cron_sync_items_availability(self):
@@ -92,19 +96,23 @@ class GeneralLoader(models.AbstractModel):
         batch = self.env["queue.job.batch"].get_new_batch("Sync item availability")
         time = fields.Datetime.now()
         for item_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay(eta=time).sync_items_availability_job(item_batch)
+            self.with_context(job_batch_id=batch).with_delay(
+                eta=time
+            ).sync_items_availability_job(item_batch)
             time += datetime.timedelta(seconds=5)
 
     @api.model
     def sync_items_availability_job(self, items, block_oppotunities_calculation=False):
-        current_world = self.env['tataru_secret_market.worlds'].get_current_world()
-        availability_model = self.env['tataru_secret_market.item_availability']
-        availability_model.with_context(ignore_calculation=block_oppotunities_calculation).sync_item_availability(items, current_world.data_center_id)
+        current_world = self.env["tataru_secret_market.worlds"].get_current_world()
+        availability_model = self.env["tataru_secret_market.item_availability"]
+        availability_model.with_context(
+            ignore_calculation=block_oppotunities_calculation
+        ).sync_item_availability(items, current_world.data_center_id)
         items.last_time_sync_availability = fields.Datetime.now()
 
-        return "Availability synced for: {}".format("\n".join(item.name for item in items))
+        return "Availability synced for: {}".format(
+            "\n".join(item.name for item in items)
+        )
 
     # Runned 1 every week
     @api.model
@@ -134,22 +142,27 @@ class GeneralLoader(models.AbstractModel):
                     fields.Datetime.now() - datetime.timedelta(days=0),
                 ),
                 ("last_time_sync_data", "=", False),
-            ])
+            ]
+        )
         # divido in batch da 8
         batch = self.env["queue.job.batch"].get_new_batch("Sync item data")
         time = fields.Datetime.now()
         for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay(eta=time).sync_item_data_job(item_batch)
-            time += datetime.timedelta(seconds=1)  # TODO - rendere tipo 10 minuti in produzione per non sovraccaricare il server
+            self.with_context(job_batch_id=batch).with_delay(
+                eta=time
+            ).sync_item_data_job(item_batch)
+            time += datetime.timedelta(
+                seconds=1
+            )  # TODO - rendere tipo 10 minuti in produzione per non sovraccaricare il server
 
     @api.model
     def sync_item_data_job(self, items):
         for item in items:
             self.env["tataru_secret_market.items"].sync_item_data(item)
 
-        return "Data synced for: \n {}".format("\n".join(" - " + item.name for item in items))
+        return "Data synced for: \n {}".format(
+            "\n".join(" - " + item.name for item in items)
+        )
 
     @api.model
     def cron_sync_item_recipe(self):
@@ -163,14 +176,15 @@ class GeneralLoader(models.AbstractModel):
                     fields.Datetime.now() - datetime.timedelta(days=7),
                 ),
                 ("last_time_sync_recipe", "=", False),
-            ])
+            ]
+        )
         # divido in batch da 8
         batch = self.env["queue.job.batch"].get_new_batch("Sync item recipe")
         time = fields.Datetime.now()
         for item_batch in [items[i : i + 8] for i in range(0, len(items), 8)]:
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay(eta=time).sync_item_recipe_job(item_batch)
+            self.with_context(job_batch_id=batch).with_delay(
+                eta=time
+            ).sync_item_recipe_job(item_batch)
             time += datetime.timedelta(seconds=1)
 
     @api.model
@@ -180,13 +194,25 @@ class GeneralLoader(models.AbstractModel):
 
     @api.model
     def cron_load_opportunities(self):
-        items = self.env["tataru_secret_market.items"].search([('sellable', '=', True), ("transactions_count_last_7d", ">", 0)], limit=1000, order="transactions_count_last_7d desc")
+        items = self.env["tataru_secret_market.items"].search(
+            [
+                ("sellable", "=", True),
+                ("transactions_count_last_7d", ">", 0),
+                (
+                    "last_time_sync_transactions",
+                    ">",
+                    fields.Datetime.now() - datetime.timedelta(days=3),
+                ),
+            ],
+            limit=3000,
+            order="transactions_count_last_7d desc",
+        )
 
         batch = self.env["queue.job.batch"].get_new_batch("Load opportunities")
         for item_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
-            self.with_context(
-                job_batch_id=batch
-            ).with_delay().load_opportunities_job(item_batch)
+            self.with_context(job_batch_id=batch).with_delay().load_opportunities_job(
+                item_batch
+            )
 
     @api.model
     def load_opportunities_job(self, items):
@@ -195,20 +221,28 @@ class GeneralLoader(models.AbstractModel):
                 [("item_id", "=", item.id)]
             )
             if old_opportunity:
-                old_opportunity.last_time_in_list_of_transactions = fields.Datetime.now()
+                old_opportunity.last_time_in_list_of_transactions = (
+                    fields.Datetime.now()
+                )
             else:
                 self.env["tataru_secret_market.item_opportunity"].create(
                     {"item_id": item.id}
                 )
 
-        return "Opportunities loaded for: \n {}".format("\n".join("- " + item.name for item in items))
+        return "Opportunities loaded for: \n {}".format(
+            "\n".join("- " + item.name for item in items)
+        )
 
     @api.model
     def cron_delete_old_oppotunities(self):
         # delete all opportunities that are older than 1 week
         opportunities = self.env["tataru_secret_market.item_opportunity"].search(
             [
-                ("last_time_in_list_of_transactions", "<", fields.Datetime.now() - datetime.timedelta(days=30)),
+                (
+                    "last_time_in_list_of_transactions",
+                    "<",
+                    fields.Datetime.now() - datetime.timedelta(days=30),
+                ),
                 ("dont_delate", "=", False),
             ]
         )
@@ -217,12 +251,26 @@ class GeneralLoader(models.AbstractModel):
 
     @api.model
     def cron_opportunities_update(self):
-        items = self.env["tataru_secret_market.item_opportunity"].search([]).mapped("item_id")
+        items = (
+            self.env["tataru_secret_market.item_opportunity"]
+            .search([])
+            .mapped("item_id")
+        )
         batch = self.env["queue.job.batch"].get_new_batch("Update opportunities")
         time = fields.Datetime.now()
-        for opportunity_batch in [items[i : i + 100] for i in range(0, len(items), 100)]:
-            job_group = group(self.delayable().with_context(job_batch_id=batch).set(eta=time).sync_items_availability_job(opportunity_batch, True),
-                              self.delayable().with_context(job_batch_id=batch).set(eta=time).sync_items_transactions_job(opportunity_batch, True))
+        for opportunity_batch in [
+            items[i : i + 100] for i in range(0, len(items), 100)
+        ]:
+            job_group = group(
+                self.delayable()
+                .with_context(job_batch_id=batch)
+                .set(eta=time)
+                .sync_items_availability_job(opportunity_batch, True),
+                self.delayable()
+                .with_context(job_batch_id=batch)
+                .set(eta=time)
+                .sync_items_transactions_job(opportunity_batch, True),
+            )
             update_calc = self.delayable().update_opportunity_calcs(opportunity_batch)
             job_group.on_done(update_calc).delay()
             # self.with_context(
@@ -235,5 +283,7 @@ class GeneralLoader(models.AbstractModel):
 
     @api.model
     def update_opportunity_calcs(self, items):
-        self.env["tataru_secret_market.item_opportunity"].search([("item_id", "in", items.ids)]).action_compute_all()
+        self.env["tataru_secret_market.item_opportunity"].search(
+            [("item_id", "in", items.ids)]
+        ).action_compute_all()
         return "Opportunities updated"

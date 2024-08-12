@@ -96,10 +96,12 @@ You can buy this item at a lower price than the average selling price. Here:
                 "&",
                 "&",
                 "&",
+                "&",
                 ("opportunity_percentage", "<", 0.9),
                 ("opportunity_percentage", ">", 0.3),
                 ("send_this_opportunity", "=", True),
                 ("opportunity_type", "=", "buy"),
+                ("price_to_buy", ">", 100),
                 "|",
                 ("last_time_send_on_discord", "=", False),
                 (
