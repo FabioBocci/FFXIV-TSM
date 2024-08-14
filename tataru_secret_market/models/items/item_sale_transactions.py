@@ -47,7 +47,7 @@ class ItemSaleTransactions(models.Model):
             if item_json is None:
                 _logger.warning(f"Not found item with id: {str(item.unique_id)} | item name: {item.name} | sellable: {item.sellable}")
                 continue
-            if "listings" not in item_json or not item_json["listings"]:
+            if "entries" not in item_json or not item_json["entries"]:
                 continue
             self.__sync_item_transactions(item, world, item_json["entries"])
             item.last_time_sync_transactions = fields.Datetime.now()
