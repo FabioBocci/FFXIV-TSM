@@ -46,7 +46,7 @@ class GeneralLoader(models.AbstractModel):
                 (
                     "last_time_sync_transactions",
                     "<",
-                    fields.Datetime.now() - datetime.timedelta(days=1),
+                    fields.Datetime.now() - datetime.timedelta(hours=8),
                 ),
                 ("last_time_sync_transactions", "=", False),
                 ("sellable", "=", True),
@@ -85,7 +85,7 @@ class GeneralLoader(models.AbstractModel):
                 (
                     "last_time_sync_availability",
                     "<",
-                    fields.Datetime.now() - datetime.timedelta(days=0),
+                    fields.Datetime.now() - datetime.timedelta(hours=8),
                 ),
                 ("last_time_sync_availability", "=", False),
                 ("sellable", "=", True),
