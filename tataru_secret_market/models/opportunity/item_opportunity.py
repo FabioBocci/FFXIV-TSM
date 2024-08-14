@@ -31,6 +31,7 @@ class ItemOpportunity(models.Model):
     )
     opportunity_image = fields.Image("Opportunity Image", public=True)
 
+    item_craftable = fields.Boolean(related="item_id.craftable")
     item_crafting = fields.One2many(related="item_id.crafting_recipe_ids")
     item_availability = fields.One2many(related="item_id.availability_ids")
 
@@ -69,11 +70,11 @@ class ItemOpportunity(models.Model):
                 record.price_to_sell = -1
                 continue
             use_only_hq = record.item_id.mostly_hq
-            record.price_to_sell = sum(
+            record.price_to_sell = int(sum(
                 record.item_id.transactions_ids.filtered(
                     lambda x: x.high_quality == use_only_hq or not use_only_hq
                 ).mapped("price")
-            ) / len(record.item_id.transactions_ids)
+            ) / len(record.item_id.transactions_ids))
 
     @api.depends("item_id", "item_id.availability_ids")
     def _compute_price_to_buy(self):

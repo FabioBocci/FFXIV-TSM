@@ -99,7 +99,7 @@
                         <field name="used_for_crafting" invisible="1"/>
                     </group>
                     <notebook>
-                        <page string="Description">
+                        <page string="Description"  groups="tataru_secret_market.group_tsm_admin">
                             <!-- TODO - Template for descriptions and other fields -->
                         </page>
                         <page string="Transactions" attrs="{'invisible': [('sellable', '=', False)]}">

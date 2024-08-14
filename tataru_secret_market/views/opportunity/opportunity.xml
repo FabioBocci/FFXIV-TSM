@@ -13,9 +13,9 @@
                 <field name="item_id"/>
                 <field name="opportunity_percentage" widget="percentage"/>
                 <field name="opportunity_type" widget="badge"/>
-                <field name="price_to_sell"/>
-                <field name="price_to_buy"/>
-                <field name="price_to_craft"/>
+                <field name="price_to_sell" widget="text" readonly="1"/>
+                <field name="price_to_buy" widget="text" readonly="1"/>
+                <field name="price_to_craft" widget="text" readonly="1"/>
                 <field name="last_time_in_list_of_transactions"/>
             </tree>
         </field>
@@ -33,14 +33,15 @@
 				</header>
                 <group col="2">
 					<group>
-						<field name="item_id"/>
-						<field name="dont_delate" />
-						<field name="price_to_sell"/>
-						<field name="price_to_buy"/>
-						<field name="price_to_craft"/>
-						<field name="opportunity_percentage"/>
+						<field name="item_id" readonly="1"/>
+						<field name="dont_delate" groups="tataru_secret_market.group_tsm_admin"/>
+						<field name="price_to_sell" widget="text" readonly="1"/>
+						<field name="price_to_buy" widget="text" readonly="1"/>
+						<field name="price_to_craft" widget="text" readonly="1"/>
+						<field name="opportunity_percentage" widget="percentage"/>
 						<field name="opportunity_type" widget="badge"/>
 						<field name="last_time_in_list_of_transactions" readonly="1"/>
+						<field name="item_craftable" invisible="1"/>
 					</group>
 					<group>
 						<field name="item_icon_hd" widget="image_url" class="o_field_image oe_avatar"/>
@@ -48,7 +49,7 @@
                 </group>
 
                 <notebook>
-                    <page string="Crafting" name="crafting">
+                    <page string="Crafting" name="crafting" attrs="{'invisible': [('item_craftable', '=', False)]}">
                         <field name="item_crafting">
                             <tree string="Item Crafting">
                                 <field name="result_item_id"/>
