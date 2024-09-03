@@ -80,11 +80,10 @@ class ItemOpportunity(models.Model):
                 )
                 / len(record.item_id.transactions_ids)
             )
+
+            availabilities = record.item_id.availability_ids.filtered(lambda x: x.world_id.id == current_world.id ) if record.item_availability else False
             price_sell_world = (
-                record.item_id.availability_ids.filtered(
-                    lambda x: x.world_id.id == current_world.id
-                )
-                .sorted("price")[0]
+                availabilities.sorted("price")[0] if availabilities else False
             )
             if price_sell_world:
                 record.price_to_sell = int(
