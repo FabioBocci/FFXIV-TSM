@@ -65,16 +65,34 @@ class ItemOpportunity(models.Model):
         if self.env.context.get("ignore_calculation", False):
             return
 
+        current_world = self.env["tataru_secret_market.worlds"].get_current_world()
         for record in self:
             if not record.item_id or len(record.item_id.transactions_ids) <= 0:
                 record.price_to_sell = -1
                 continue
             use_only_hq = record.item_id.mostly_hq
-            record.price_to_sell = int(sum(
-                record.item_id.transactions_ids.filtered(
-                    lambda x: x.high_quality == use_only_hq or not use_only_hq
-                ).mapped("price")
-            ) / len(record.item_id.transactions_ids))
+
+            avg_price_selled = int(
+                sum(
+                    record.item_id.transactions_ids.filtered(
+                        lambda x: x.high_quality == use_only_hq or not use_only_hq
+                    ).mapped("price")
+                )
+                / len(record.item_id.transactions_ids)
+            )
+            price_sell_world = (
+                record.item_id.availability_ids.filtered(
+                    lambda x: x.world_id.id == current_world.id
+                )
+                .order_by("price")
+                .first()
+            )
+            if price_sell_world:
+                record.price_to_sell = int(
+                    min(avg_price_selled, price_sell_world.price)
+                )
+            else:
+                record.price_to_sell = int(avg_price_selled)
 
     @api.depends("item_id", "item_id.availability_ids")
     def _compute_price_to_buy(self):
