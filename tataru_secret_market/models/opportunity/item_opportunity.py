@@ -84,7 +84,7 @@ class ItemOpportunity(models.Model):
                 record.item_id.availability_ids.filtered(
                     lambda x: x.world_id.id == current_world.id
                 )
-                .order_by("price")
+                .sorted("price")
                 .first()
             )
             if price_sell_world:
