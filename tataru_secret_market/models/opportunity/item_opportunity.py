@@ -34,6 +34,10 @@ class ItemOpportunity(models.Model):
     item_craftable = fields.Boolean(related="item_id.craftable")
     item_crafting = fields.One2many(related="item_id.crafting_recipe_ids")
     item_availability = fields.One2many(related="item_id.availability_ids")
+    item_sales = fields.One2many(related="item_id.transactions_ids")
+
+    transactions_count_last_24h = fields.Integer(related="item_id.transactions_count_last_24h")
+    transactions_count_last_7d = fields.Integer(related="item_id.transactions_count_last_7d")
 
     last_time_in_list_of_transactions = fields.Datetime()
     dont_delate = fields.Boolean(default=False)  # TODO - create method

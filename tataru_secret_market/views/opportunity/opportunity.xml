@@ -57,7 +57,7 @@
                         </field>
                     </page>
                     <page string="Availability" name="availability">
-                        <field name="item_availability" nolabel="1" colspan="2">
+                        <field name="item_availability" nolabel="1" colspan="2" domain="[('world_id.name', '!=', 'Phantom')]">
                             <tree>
                                 <field name="world_id"/>
                                 <field name="price"/>
@@ -65,6 +65,31 @@
                                 <field name="total_price_with_tax"/>
                                 <field name="high_quality"/>
                                 <field name="reteiner_name"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Availability Phantom" name="availability_phantom">
+                        <field name="item_availability" nolabel="1" colspan="2" domain="[('world_id.name', '=', 'Phantom')]">
+                            <tree>
+                                <field name="world_id"/>
+                                <field name="price"/>
+                                <field name="quantity"/>
+                                <field name="total_price_with_tax"/>
+                                <field name="high_quality"/>
+                                <field name="reteiner_name"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Transactions" name="transactions">
+                        <field name="item_sales">
+                            <tree>
+                                <field name="sale_date"/>
+                                <field name="buyer_name"/>
+                                <field name="world_id"/>
+                                <field name="quantity"/>
+                                <field name="price"/>
+                                <field name="total_price"/>
+                                <field name="high_quality"/>
                             </tree>
                         </field>
                     </page>
