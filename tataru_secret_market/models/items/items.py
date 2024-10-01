@@ -23,6 +23,8 @@ class Items(models.Model):
     mostly_hq = fields.Boolean(compute='_compute_transactions_count', store=True)
 
     availability_ids = fields.One2many('tataru_secret_market.item_availability', 'item_id')
+    availability_filtered_ids = fields.One2many("tataru_secret_market.item_availability", "item_id", compute="_compute_availability_filtered_ids")
+    availability_filtered_other_worlds_ids = fields.One2many("tataru_secret_market.item_availability", "item_id", compute="_compute_availability_filtered_ids")
 
     last_time_sync_transactions = fields.Datetime()
     last_time_sync_availability = fields.Datetime()
@@ -43,6 +45,12 @@ class Items(models.Model):
             record.transactions_count_last_24h = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=1))))
             record.transactions_count_last_7d = len(record.transactions_ids.filtered(lambda x: x.sale_date > (fields.Datetime.now() - datetime.timedelta(days=7))))
             record.mostly_hq = len(record.transactions_ids.filtered(lambda x: x.high_quality)) / len(record.transactions_ids) > require_hq_percentage if len(record.transactions_ids) > 0 else False
+
+    @api.depends('transactions_ids')
+    def _compute_availability_filtered_ids(self):
+        for record in self:
+            record.availability_filtered_ids = record.availability_ids.filtered(lambda x: x.world_id.unique_id == self.env['tataru_secret_market.worlds'].get_current_world().unique_id)
+            record.availability_filtered_other_worlds_ids = record.availability_ids.filtered(lambda x: x.world_id.unique_id != self.env['tataru_secret_market.worlds'].get_current_world().unique_id)
 
     @api.depends('ingredients_ids')
     def _compute_used_for_crafting(self):

@@ -57,7 +57,7 @@
                         </field>
                     </page>
                     <page string="Availability" name="availability">
-                        <field name="item_availability" nolabel="1" colspan="2" domain="[('world_id.name', '!=', 'Phantom')]">
+                        <field name="item_availability_filtered_others" nolabel="1" colspan="2">
                             <tree>
                                 <field name="world_id"/>
                                 <field name="price"/>
@@ -69,7 +69,7 @@
                         </field>
                     </page>
                     <page string="Availability Phantom" name="availability_phantom">
-                        <field name="item_availability" nolabel="1" colspan="2" domain="[('world_id.name', '=', 'Phantom')]">
+                        <field name="item_availability_filtered" nolabel="1" colspan="2">
                             <tree>
                                 <field name="world_id"/>
                                 <field name="price"/>

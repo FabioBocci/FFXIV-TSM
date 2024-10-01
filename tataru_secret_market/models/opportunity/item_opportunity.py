@@ -34,6 +34,8 @@ class ItemOpportunity(models.Model):
     item_craftable = fields.Boolean(related="item_id.craftable")
     item_crafting = fields.One2many(related="item_id.crafting_recipe_ids")
     item_availability = fields.One2many(related="item_id.availability_ids")
+    item_availability_filtered = fields.One2many(related="item_id.availability_filtered_ids")
+    item_availability_filtered_others = fields.One2many(related="item_id.availability_filtered_other_worlds_ids")
     item_sales = fields.One2many(related="item_id.transactions_ids")
 
     transactions_count_last_24h = fields.Integer(related="item_id.transactions_count_last_24h")
