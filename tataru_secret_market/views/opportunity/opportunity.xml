@@ -27,7 +27,7 @@
         <field name="name">item.opportunity.form</field>
         <field name="model">tataru_secret_market.item_opportunity</field>
         <field name="arch" type="xml">
-            <form string="Item Opportunities">
+            <sheet string="Item Opportunities">
 				<header>
 					<button name="action_compute_all" string="Reload" type="object" class="btn btn-primary"/>
 				</header>
@@ -97,7 +97,7 @@
                         <field name="opportunity_image" widget="image" />
                     </page>
                 </notebook>
-            </form>
+            </sheet>
         </field>
     </record>
 

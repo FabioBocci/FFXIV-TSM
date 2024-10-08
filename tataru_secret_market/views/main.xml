@@ -1,6 +1,4 @@
 <odoo>
-
-
     <!-- Menu item for Items -->
     <menuitem id="menu_items" name="Items" action="action_items" web_icon="tataru_secret_market,static/description/item_icon.png"/>
 
@@ -23,6 +21,6 @@
               action="action_tataru_secret_market_item_sale_transactions"  groups="tataru_secret_market.group_tsm_admin"/>
 
 	<!-- Menu item for Item Opportunities -->
-    <menuitem id="menu_item_opportunity" name="Item Opportunities" action="action_item_opportunity"/>
+    <menuitem id="menu_item_opportunity" name="Item Opportunities" action="action_item_opportunity" web_icon="tataru_secret_market,static/description/opportunities_icon.png"/>
 
 </odoo>
